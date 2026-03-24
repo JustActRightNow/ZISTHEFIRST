@@ -1098,13 +1098,13 @@
     <p class="email-eyebrow">Drop Notifications</p>
     <h2 class="email-headline">BE THE<br/>FIRST.</h2>
     <p class="email-sub">Get notified before every collection drop. Limited pieces.<br/>First come, first served.</p>
-    <form class="email-form" name="drop-signups" netlify>
-      <input type="email" class="email-input" placeholder="your@email.com" id="email-input" name="email" />
-      <button type="button" class="email-submit" onclick="submitEmail()">NOTIFY ME</button>
+    <div class="email-form">
+      <input type="email" class="email-input" placeholder="your@email.com" id="email-input" />
+      <button class="email-submit" onclick="submitEmail()">NOTIFY ME</button>
     </div>
     <p class="email-success" id="email-success">✓ &nbsp;YOU'RE IN. WATCH YOUR INBOX.</p>
-  </form>
-
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer id="contact">
@@ -1321,7 +1321,7 @@ const products = [
     material: "Plain Cotton",
     sizes: ["M", "L", "XL"],
     type: "always",
-    img: null,
+    img: "https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png",
     tag: "Always Available"
   },
   {
@@ -1331,7 +1331,7 @@ const products = [
     material: "Plain Cotton",
     sizes: ["M", "L", "XL"],
     type: "always",
-    img: null,
+    img: "https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png",
     tag: "Always Available"
   },
   {
@@ -1341,7 +1341,7 @@ const products = [
     material: "Plain Cotton",
     sizes: ["M", "L", "XL"],
     type: "always",
-    img: null,
+    img: "https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png",
     tag: "Always Available"
   },
   {
@@ -1351,7 +1351,7 @@ const products = [
     material: "Plain Cotton",
     sizes: ["M", "L", "XL"],
     type: "always",
-    img: null,
+    img: "https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png",
     tag: "Always Available"
   },
   {
@@ -1361,7 +1361,7 @@ const products = [
     material: "One Size Fits All",
     sizes: ["ONE SIZE"],
     type: "limited",
-    img: null,
+    img: "https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png",
     tag: "Limited Drop"
   }
 ];
@@ -1385,7 +1385,10 @@ function renderProducts() {
   grid.innerHTML = products.map(p => `
     <div class="product-card fade-in" onclick="openModal(${p.id})">
       <div class="product-img-wrap">
-        <div class="product-img-placeholder">ZISTHEFIRST</div>
+        ${p.img
+          ? `<img src="${p.img}" alt="${p.name}" loading="lazy" />`
+          : `<div class="product-img-placeholder">ZISTHEFIRST</div>`
+        }
         <span class="badge ${p.type === 'limited' ? 'badge-limited' : 'badge-available'}">
           ${p.type === 'limited' ? 'LIMITED DROP' : 'IN STOCK'}
         </span>
@@ -1411,6 +1414,13 @@ function openModal(id) {
   document.getElementById('modal-material').textContent = currentProduct.material;
   document.getElementById('modal-price').textContent = formatPrice(currentProduct.price);
   document.getElementById('modal-badge').innerHTML = `<span class="badge ${currentProduct.type === 'limited' ? 'badge-limited' : 'badge-available'}">${currentProduct.tag}</span>`;
+
+  const modalImgEl = document.querySelector('.modal-img');
+  if (currentProduct.img) {
+    modalImgEl.innerHTML = `<img src="${currentProduct.img}" alt="${currentProduct.name}" style="width:100%;height:100%;object-fit:cover;" />`;
+  } else {
+    modalImgEl.innerHTML = `<div class="modal-img-placeholder">ZISTHEFIRST</div>`;
+  }
 
   const sizesEl = document.getElementById('modal-sizes');
   sizesEl.innerHTML = currentProduct.sizes.map(s =>
@@ -1578,20 +1588,9 @@ function initiatePaystack() {
 function submitEmail() {
   const val = document.getElementById('email-input').value.trim();
   if (!val || !val.includes('@')) { showToast('ENTER A VALID EMAIL'); return; }
-  fetch('/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      'form-name': 'drop-signups',
-      'email': val
-    }).toString()
-  }).then(() => {
-    document.getElementById('email-success').style.display = 'block';
-    document.getElementById('email-input').value = '';
-    showToast("YOU'RE IN. WATCH YOUR INBOX.");
-  }).catch(() => {
-    showToast('SOMETHING WENT WRONG. TRY AGAIN.');
-  });
+  document.getElementById('email-success').style.display = 'block';
+  document.getElementById('email-input').value = '';
+  showToast('YOU\'RE IN. WATCH YOUR INBOX.');
 }
 
 // ─────────────────────────────────────────────

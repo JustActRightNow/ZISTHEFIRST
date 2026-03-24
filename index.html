@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZISTHEFIRST — Official Store</title>
+  <meta name="description" content="ZISTHEFIRST — Official streetwear. Shop tees, hoodies and accessories. Lagos, Nigeria." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+
+  <style>
+    :root {
+      --black: #000000;
+      --white: #ffffff;
+      --red: #cc0000;
+      --red-dim: #880000;
+      --grey: #111111;
+      --grey2: #1a1a1a;
+      --grey-text: #666666;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'Space Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 13px;
+      line-height: 1.6;
+      cursor: crosshair;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    img { display: block; width: 100%; }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--red); }
+
+    /* ─── BARCODE DIVIDER ─── */
+    .barcode-divider {
+      width: 100%;
+      height: 32px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--white) 0px, var(--white) 2px,
+        transparent 2px, transparent 5px,
+        var(--white) 5px, var(--white) 6px,
+        transparent 6px, transparent 11px,
+        var(--white) 11px, var(--white) 14px,
+        transparent 14px, transparent 17px,
+        var(--white) 17px, var(--white) 18px,
+        transparent 18px, transparent 25px
+      );
+      opacity: 0.08;
+      margin: 60px 0;
+    }
+    .barcode-divider.red {
+      background: repeating-linear-gradient(
+        90deg,
+        var(--red) 0px, var(--red) 2px,
+        transparent 2px, transparent 5px,
+        var(--red) 5px, var(--red) 6px,
+        transparent 6px, transparent 11px,
+        var(--red) 11px, var(--red) 14px,
+        transparent 14px, transparent 17px,
+        var(--red) 17px, var(--red) 18px,
+        transparent 18px, transparent 25px
+      );
+      opacity: 0.25;
+      margin: 0;
+      height: 3px;
+    }
+
+    /* ─── ANNOUNCEMENT BAR ─── */
+    .announce {
+      background: var(--red);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-align: center;
+      padding: 8px 16px;
+      text-transform: uppercase;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .announce-inner {
+      display: inline-block;
+      animation: ticker 18s linear infinite;
+    }
+    @keyframes ticker {
+      0% { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--black);
+      border-bottom: 1px solid #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 22px;
+      letter-spacing: 0.12em;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--grey-text);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .cart-btn {
+      background: none;
+      border: 1px solid #333;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      padding: 8px 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .cart-btn:hover { border-color: var(--red); color: var(--red); }
+    #cart-count {
+      background: var(--red);
+      color: var(--white);
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      font-size: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 4px;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 48px 24px;
+      position: relative;
+      overflow: hidden;
+      background: var(--black);
+    }
+    .hero-bg-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display);
+      font-size: clamp(80px, 22vw, 280px);
+      color: transparent;
+      -webkit-text-stroke: 1px #1a1a1a;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -0.02em;
+    }
+    .hero-barcode {
+      width: min(520px, 90%);
+      margin-bottom: 24px;
+    }
+    .hero-barcode svg { width: 100%; height: auto; }
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--grey-text);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(52px, 12vw, 120px);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      margin-bottom: 24px;
+    }
+    .hero-headline span { color: var(--red); }
+    .hero-sub {
+      font-size: 11px;
+      color: var(--grey-text);
+      letter-spacing: 0.1em;
+      max-width: 360px;
+      margin-bottom: 36px;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #ff0000; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid #333;
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      display: inline-block;
+    }
+    .btn-ghost:hover { border-color: var(--white); }
+    .hero-scroll {
+      position: absolute;
+      right: 24px;
+      bottom: 48px;
+      writing-mode: vertical-rl;
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      color: var(--grey-text);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .hero-scroll::before {
+      content: '';
+      width: 1px;
+      height: 48px;
+      background: var(--red);
+      animation: scrollLine 1.5s ease-in-out infinite;
+    }
+    @keyframes scrollLine {
+      0%, 100% { opacity: 1; transform: scaleY(1); }
+      50% { opacity: 0.3; transform: scaleY(0.5); }
+    }
+
+    /* ─── SECTION WRAPPER ─── */
+    .section { padding: 80px 24px; max-width: 1200px; margin: 0 auto; }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 8vw, 72px);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .section-label {
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      color: var(--grey-text);
+      text-transform: uppercase;
+      border-left: 2px solid var(--red);
+      padding-left: 10px;
+    }
+
+    /* ─── PRODUCT GRID ─── */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2px;
+    }
+    .product-card {
+      background: var(--grey);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .product-card:hover { transform: translateY(-4px); }
+    .product-card:hover .product-img-wrap img { transform: scale(1.04); }
+    .product-img-wrap {
+      aspect-ratio: 1/1;
+      overflow: hidden;
+      background: #0a0a0a;
+      position: relative;
+    }
+    .product-img-wrap img { object-fit: cover; height: 100%; transition: transform 0.5s; }
+    .product-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d0d0d;
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: #222;
+    }
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+    }
+    .badge-limited { background: var(--red); color: var(--white); }
+    .badge-available { background: #111; color: var(--grey-text); border: 1px solid #333; }
+    .product-info {
+      padding: 16px;
+      border-top: 1px solid #1a1a1a;
+    }
+    .product-name {
+      font-family: var(--font-display);
+      font-size: 18px;
+      letter-spacing: 0.06em;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .product-material {
+      font-size: 9px;
+      color: var(--grey-text);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .product-price {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .product-price .currency { color: var(--red); font-size: 11px; }
+
+    /* ─── PRODUCT MODAL ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--grey);
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      border: 1px solid #222;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1;
+      line-height: 1;
+    }
+    .modal-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 600px) {
+      .modal-inner { grid-template-columns: 1fr; }
+    }
+    .modal-img {
+      aspect-ratio: 1/1;
+      background: #0a0a0a;
+      overflow: hidden;
+    }
+    .modal-img img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-img-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: #222;
+    }
+    .modal-details { padding: 32px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .modal-name { font-family: var(--font-display); font-size: 28px; letter-spacing: 0.05em; line-height: 1.1; }
+    .modal-price { font-size: 20px; font-weight: 700; }
+    .modal-price .currency { color: var(--red); font-size: 14px; }
+    .modal-material { font-size: 10px; color: var(--grey-text); letter-spacing: 0.15em; text-transform: uppercase; }
+    .modal-label { font-size: 10px; letter-spacing: 0.2em; color: var(--grey-text); text-transform: uppercase; margin-bottom: 8px; }
+    .size-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+    .size-btn {
+      width: 44px;
+      height: 44px;
+      border: 1px solid #333;
+      background: none;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.05em;
+    }
+    .size-btn:hover { border-color: var(--white); }
+    .size-btn.active { background: var(--red); border-color: var(--red); color: var(--white); }
+    .size-btn.one-size { width: auto; padding: 0 16px; }
+    .modal-add-btn {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: auto;
+      transition: background 0.2s;
+    }
+    .modal-add-btn:hover { background: #ff0000; }
+    .modal-add-btn:disabled { background: #333; cursor: not-allowed; }
+
+    /* ─── CART DRAWER ─── */
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1500;
+      display: none;
+    }
+    .cart-overlay.open { display: block; }
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: min(400px, 100vw);
+      height: 100vh;
+      background: var(--grey);
+      z-index: 1600;
+      border-left: 1px solid #222;
+      transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .cart-drawer.open { right: 0; }
+    .cart-header {
+      padding: 24px;
+      border-bottom: 1px solid #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cart-title { font-family: var(--font-display); font-size: 24px; letter-spacing: 0.1em; }
+    .cart-close-btn {
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .cart-items { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .cart-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      color: var(--grey-text);
+    }
+    .cart-empty-icon { font-size: 32px; }
+    .cart-empty p { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 60px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .cart-item-img {
+      width: 60px;
+      height: 60px;
+      background: #0a0a0a;
+      overflow: hidden;
+      border: 1px solid #222;
+    }
+    .cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .cart-item-name { font-family: var(--font-display); font-size: 14px; letter-spacing: 0.05em; line-height: 1.1; }
+    .cart-item-size { font-size: 9px; color: var(--grey-text); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 4px; }
+    .cart-item-price { font-size: 12px; font-weight: 700; }
+    .cart-item-remove {
+      background: none;
+      border: none;
+      color: var(--grey-text);
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 4px;
+      transition: color 0.15s;
+    }
+    .cart-item-remove:hover { color: var(--red); }
+    .cart-footer {
+      padding: 20px 24px;
+      border-top: 1px solid #222;
+    }
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .cart-total-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey-text); }
+    .cart-total-price { font-size: 18px; font-weight: 700; }
+    .checkout-btn {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-bottom: 10px;
+      transition: background 0.2s;
+    }
+    .checkout-btn:hover { background: #ff0000; }
+    .checkout-note {
+      font-size: 9px;
+      color: var(--grey-text);
+      letter-spacing: 0.1em;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* ─── CHECKOUT FORM OVERLAY ─── */
+    .checkout-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.96);
+      z-index: 2500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .checkout-overlay.open { display: flex; }
+    .checkout-form-box {
+      background: var(--grey);
+      width: 100%;
+      max-width: 480px;
+      border: 1px solid #222;
+      position: relative;
+    }
+    .checkout-form-header {
+      padding: 24px;
+      border-bottom: 1px solid #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .checkout-form-title { font-family: var(--font-display); font-size: 24px; letter-spacing: 0.1em; }
+    .checkout-form-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey-text); }
+    .form-input {
+      background: var(--black);
+      border: 1px solid #333;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 12px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: var(--red); }
+    .form-input::placeholder { color: #444; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .pay-btn {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      font-family: var(--font-body);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .pay-btn:hover { background: #ff0000; }
+
+    /* ─── ABOUT STRIP ─── */
+    .about-strip {
+      background: var(--grey2);
+      padding: 80px 24px;
+    }
+    .about-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    @media (max-width: 700px) {
+      .about-inner { grid-template-columns: 1fr; }
+    }
+    .about-label {
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .about-headline {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 7vw, 72px);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin-bottom: 24px;
+    }
+    .about-text {
+      font-size: 12px;
+      color: var(--grey-text);
+      line-height: 1.9;
+      letter-spacing: 0.03em;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+    .stat-box {
+      background: #111;
+      padding: 28px 24px;
+      border: 1px solid #1a1a1a;
+    }
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 52px;
+      line-height: 1;
+      color: var(--white);
+      letter-spacing: 0.02em;
+    }
+    .stat-number span { color: var(--red); }
+    .stat-label {
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--grey-text);
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    /* ─── EMAIL CAPTURE ─── */
+    .email-section {
+      background: var(--black);
+      padding: 80px 24px;
+      border-top: 1px solid #111;
+      border-bottom: 1px solid #111;
+    }
+    .email-inner {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .email-eyebrow {
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .email-headline {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 7vw, 64px);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .email-sub {
+      font-size: 11px;
+      color: var(--grey-text);
+      letter-spacing: 0.08em;
+      margin-bottom: 32px;
+    }
+    .email-form {
+      display: flex;
+      gap: 0;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .email-input {
+      flex: 1;
+      background: var(--grey);
+      border: 1px solid #333;
+      border-right: none;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 12px;
+      padding: 14px 16px;
+      outline: none;
+    }
+    .email-input:focus { border-color: var(--red); }
+    .email-input::placeholder { color: #444; }
+    .email-submit {
+      background: var(--red);
+      color: var(--white);
+      border: 1px solid var(--red);
+      font-family: var(--font-body);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 20px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .email-submit:hover { background: #ff0000; }
+    .email-success {
+      font-size: 11px;
+      color: var(--red);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: none;
+      margin-top: 16px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #050505;
+      padding: 60px 24px 32px;
+      border-top: 1px solid #1a1a1a;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 700px) {
+      .footer-top { grid-template-columns: 1fr; gap: 32px; }
+    }
+    .footer-brand-name {
+      font-family: var(--font-display);
+      font-size: 32px;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .footer-brand-name span { color: var(--red); }
+    .footer-brand-tagline {
+      font-size: 10px;
+      color: var(--grey-text);
+      letter-spacing: 0.15em;
+      line-height: 1.7;
+      max-width: 280px;
+    }
+    .footer-col-title {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 16px;
+      border-left: 2px solid var(--red);
+      padding-left: 8px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a {
+      font-size: 11px;
+      color: var(--grey-text);
+      letter-spacing: 0.1em;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+    .footer-bottom {
+      border-top: 1px solid #1a1a1a;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy { font-size: 9px; color: var(--grey-text); letter-spacing: 0.15em; }
+    .footer-est { font-size: 9px; color: var(--grey-text); letter-spacing: 0.15em; }
+    .footer-est span { color: var(--red); }
+
+    /* ─── WHATSAPP FAB ─── */
+    .wa-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #25d366;
+      color: var(--white);
+      border: none;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+      transition: transform 0.2s;
+    }
+    .wa-fab:hover { transform: scale(1.1); }
+
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      right: 24px;
+      background: var(--red);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 12px 20px;
+      z-index: 3000;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ─── LEGAL PAGES ─── */
+    .legal-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--black);
+      z-index: 3000;
+      overflow-y: auto;
+      display: none;
+      padding: 48px 24px;
+    }
+    .legal-overlay.open { display: block; }
+    .legal-inner { max-width: 720px; margin: 0 auto; }
+    .legal-back {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: var(--font-body);
+      margin-bottom: 32px;
+      display: block;
+    }
+    .legal-title { font-family: var(--font-display); font-size: 48px; margin-bottom: 32px; }
+    .legal-content { font-size: 12px; color: var(--grey-text); line-height: 2; }
+    .legal-content h3 { font-family: var(--font-display); font-size: 20px; color: var(--white); margin: 28px 0 10px; letter-spacing: 0.05em; }
+    .legal-content p { margin-bottom: 14px; }
+
+    /* ─── MOBILE NAV OVERRIDES ─── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      nav { padding: 0 16px; }
+      .hero { padding: 40px 16px; }
+      .hero-scroll { display: none; }
+    }
+
+    /* ─── FADE IN ─── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT -->
+<div class="announce">
+  <span class="announce-inner">
+    FREE DELIVERY COORDINATION — ORDER NOW &nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp; 
+    ZISTHEFIRST EST. 2024 &nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp; 
+    IFUXS WITH IT &nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp; 
+    NEW COLLECTION DROP COMING SOON &nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp; 
+    ALL PRICES IN NAIRA &nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp;
+  </span>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">ZIS<span>THE</span>FIRST</div>
+  <ul class="nav-links">
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#drops">Drops</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="cart-btn" onclick="openCart()">
+      CART <span id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">ZTF</div>
+  <div class="hero-barcode">
+    <svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <!-- white bars -->
+      <g fill="white" opacity="0.9">
+        <rect x="0" y="0" width="3" height="54"/><rect x="6" y="0" width="1" height="54"/>
+        <rect x="10" y="0" width="4" height="54"/><rect x="17" y="0" width="2" height="54"/>
+        <rect x="22" y="0" width="1" height="54"/><rect x="26" y="0" width="3" height="54"/>
+        <rect x="32" y="0" width="1" height="54"/><rect x="36" y="0" width="4" height="54"/>
+        <rect x="43" y="0" width="2" height="54"/><rect x="48" y="0" width="1" height="54"/>
+        <rect x="52" y="0" width="3" height="54"/><rect x="58" y="0" width="2" height="54"/>
+        <rect x="63" y="0" width="1" height="54"/><rect x="67" y="0" width="4" height="54"/>
+        <rect x="74" y="0" width="1" height="54"/><rect x="78" y="0" width="3" height="54"/>
+        <rect x="84" y="0" width="2" height="54"/><rect x="89" y="0" width="1" height="54"/>
+        <rect x="93" y="0" width="4" height="54"/><rect x="100" y="0" width="1" height="54"/>
+        <rect x="104" y="0" width="2" height="54"/><rect x="109" y="0" width="3" height="54"/>
+        <rect x="115" y="0" width="1" height="54"/><rect x="119" y="0" width="4" height="54"/>
+        <rect x="126" y="0" width="2" height="54"/><rect x="131" y="0" width="1" height="54"/>
+        <rect x="135" y="0" width="3" height="54"/><rect x="141" y="0" width="1" height="54"/>
+        <rect x="145" y="0" width="2" height="54"/><rect x="150" y="0" width="4" height="54"/>
+        <rect x="157" y="0" width="1" height="54"/><rect x="161" y="0" width="3" height="54"/>
+        <rect x="167" y="0" width="2" height="54"/><rect x="172" y="0" width="1" height="54"/>
+        <rect x="176" y="0" width="4" height="54"/><rect x="183" y="0" width="2" height="54"/>
+        <rect x="188" y="0" width="1" height="54"/><rect x="192" y="0" width="3" height="54"/>
+        <rect x="198" y="0" width="1" height="54"/><rect x="202" y="0" width="2" height="54"/>
+        <rect x="207" y="0" width="4" height="54"/><rect x="214" y="0" width="1" height="54"/>
+        <rect x="218" y="0" width="3" height="54"/><rect x="224" y="0" width="2" height="54"/>
+        <rect x="229" y="0" width="1" height="54"/><rect x="233" y="0" width="4" height="54"/>
+        <rect x="240" y="0" width="1" height="54"/><rect x="244" y="0" width="3" height="54"/>
+        <rect x="250" y="0" width="2" height="54"/><rect x="255" y="0" width="1" height="54"/>
+        <rect x="259" y="0" width="4" height="54"/><rect x="266" y="0" width="2" height="54"/>
+        <rect x="271" y="0" width="1" height="54"/><rect x="275" y="0" width="3" height="54"/>
+        <rect x="281" y="0" width="1" height="54"/><rect x="285" y="0" width="2" height="54"/>
+        <rect x="290" y="0" width="4" height="54"/><rect x="297" y="0" width="1" height="54"/>
+      </g>
+      <!-- red bars -->
+      <g fill="#cc0000" opacity="0.95">
+        <rect x="303" y="0" width="3" height="54"/><rect x="309" y="0" width="1" height="54"/>
+        <rect x="313" y="0" width="4" height="54"/><rect x="320" y="0" width="2" height="54"/>
+        <rect x="325" y="0" width="1" height="54"/><rect x="329" y="0" width="3" height="54"/>
+        <rect x="335" y="0" width="1" height="54"/><rect x="339" y="0" width="4" height="54"/>
+        <rect x="346" y="0" width="2" height="54"/><rect x="351" y="0" width="1" height="54"/>
+        <rect x="355" y="0" width="3" height="54"/><rect x="361" y="0" width="2" height="54"/>
+        <rect x="366" y="0" width="1" height="54"/><rect x="370" y="0" width="4" height="54"/>
+        <rect x="377" y="0" width="1" height="54"/><rect x="381" y="0" width="3" height="54"/>
+        <rect x="387" y="0" width="2" height="54"/><rect x="392" y="0" width="1" height="54"/>
+        <rect x="396" y="0" width="4" height="54"/><rect x="403" y="0" width="1" height="54"/>
+        <rect x="407" y="0" width="2" height="54"/><rect x="412" y="0" width="3" height="54"/>
+        <rect x="418" y="0" width="1" height="54"/><rect x="422" y="0" width="4" height="54"/>
+        <rect x="429" y="0" width="2" height="54"/><rect x="434" y="0" width="1" height="54"/>
+        <rect x="438" y="0" width="3" height="54"/><rect x="444" y="0" width="1" height="54"/>
+        <rect x="448" y="0" width="2" height="54"/><rect x="453" y="0" width="4" height="54"/>
+        <rect x="460" y="0" width="1" height="54"/><rect x="464" y="0" width="3" height="54"/>
+        <rect x="470" y="0" width="2" height="54"/><rect x="475" y="0" width="1" height="54"/>
+        <rect x="479" y="0" width="4" height="54"/><rect x="486" y="0" width="2" height="54"/>
+        <rect x="491" y="0" width="1" height="54"/><rect x="495" y="0" width="3" height="54"/>
+        <rect x="501" y="0" width="1" height="54"/><rect x="505" y="0" width="4" height="54"/>
+        <rect x="512" y="0" width="2" height="54"/><rect x="517" y="0" width="1" height="54"/>
+        <rect x="521" y="0" width="3" height="54"/><rect x="527" y="0" width="4" height="54"/>
+        <rect x="534" y="0" width="1" height="54"/><rect x="538" y="0" width="3" height="54"/>
+        <rect x="544" y="0" width="2" height="54"/><rect x="549" y="0" width="1" height="54"/>
+        <rect x="553" y="0" width="4" height="54"/><rect x="560" y="0" width="2" height="54"/>
+        <rect x="565" y="0" width="1" height="54"/><rect x="569" y="0" width="3" height="54"/>
+        <rect x="575" y="0" width="1" height="54"/><rect x="579" y="0" width="2" height="54"/>
+        <rect x="584" y="0" width="4" height="54"/><rect x="591" y="0" width="1" height="54"/>
+        <rect x="595" y="0" width="3" height="54"/>
+      </g>
+      <!-- text -->
+      <text x="0" y="74" font-family="'Space Mono', monospace" font-size="13" fill="white" letter-spacing="14">ZISTHE</text>
+      <text x="170" y="74" font-family="'Space Mono', monospace" font-size="13" fill="#cc0000" letter-spacing="14">FIRST</text>
+    </svg>
+  </div>
+  <p class="hero-eyebrow">EST. 2024 — LAGOS, NIGERIA</p>
+  <h1 class="hero-headline">ZIS<span>THE</span><br/>FIRST.</h1>
+  <p class="hero-sub">Streetwear built different. Made for the ones who move first.</p>
+  <div class="hero-ctas">
+    <button class="btn-primary" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">SHOP NOW</button>
+    <a href="#about" class="btn-ghost">OUR STORY</a>
+  </div>
+  <div class="hero-scroll">SCROLL</div>
+</section>
+
+<div class="barcode-divider"></div>
+
+<!-- SHOP -->
+<div class="section" id="shop">
+  <div class="section-header fade-in">
+    <h2 class="section-title">SHOP</h2>
+    <span class="section-label">5 Products Available</span>
+  </div>
+  <div class="product-grid" id="product-grid"></div>
+</div>
+
+<div class="barcode-divider red"></div>
+
+<!-- ABOUT -->
+<div class="about-strip" id="about">
+  <div class="about-inner">
+    <div class="fade-in">
+      <p class="about-label">The Brand</p>
+      <h2 class="about-headline">MADE FOR THE<br/>ONES WHO<br/>MOVE FIRST.</h2>
+      <p class="about-text">
+        ZISTHEFIRST is a Lagos-born streetwear brand built on the idea that being first isn't just timing — it's identity. Every piece is crafted with intention. From the barcode that splits white to red, to every stitch on every drop. This is not fast fashion. This is a statement.
+      </p>
+    </div>
+    <div class="about-stats fade-in">
+      <div class="stat-box">
+        <div class="stat-number">24<span>/7</span></div>
+        <div class="stat-label">Always Available</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number"><span>₦</span></div>
+        <div class="stat-label">Naira Pricing</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">01</div>
+        <div class="stat-label">Est. 2024</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-number">NG</div>
+        <div class="stat-label">Lagos, Nigeria</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="barcode-divider red"></div>
+
+<!-- EMAIL CAPTURE -->
+<div class="email-section" id="drops">
+  <div class="email-inner fade-in">
+    <p class="email-eyebrow">Drop Notifications</p>
+    <h2 class="email-headline">BE THE<br/>FIRST.</h2>
+    <p class="email-sub">Get notified before every collection drop. Limited pieces.<br/>First come, first served.</p>
+    <div class="email-form">
+      <input type="email" class="email-input" placeholder="your@email.com" id="email-input" />
+      <button class="email-submit" onclick="submitEmail()">NOTIFY ME</button>
+    </div>
+    <p class="email-success" id="email-success">✓ &nbsp;YOU'RE IN. WATCH YOUR INBOX.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="barcode-divider" style="margin:0 0 48px 0; opacity:0.05;"></div>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">ZIS<span>THE</span>FIRST</div>
+        <p class="footer-brand-tagline">
+          Lagos-born streetwear.<br/>
+          For the ones who move first.<br/><br/>
+          Orders & support via WhatsApp.<br/>
+          Delivery coordinated after purchase.
+        </p>
+      </div>
+      <div>
+        <p class="footer-col-title">Navigate</p>
+        <ul class="footer-links">
+          <li><a href="#shop">Shop</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#drops">Drop Alerts</a></li>
+          <li><a href="https://wa.me/2347034626602" target="_blank">WhatsApp Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Legal</p>
+        <ul class="footer-links">
+          <li><a href="#" onclick="openLegal('refund')">Refund Policy</a></li>
+          <li><a href="#" onclick="openLegal('terms')">Terms & Conditions</a></li>
+          <li><a href="#" onclick="openLegal('privacy')">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2024 ZISTHEFIRST. All rights reserved.</p>
+      <p class="footer-est">EST. <span>2024</span> — LAGOS, NG</p>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FAB -->
+<a href="https://wa.me/2347034626602" target="_blank" class="wa-fab" title="Chat on WhatsApp">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-inner">
+      <div class="modal-img">
+        <div class="modal-img-placeholder" id="modal-img-placeholder">ZISTHEFIRST</div>
+      </div>
+      <div class="modal-details">
+        <div>
+          <p id="modal-badge"></p>
+          <h2 class="modal-name" id="modal-name"></h2>
+          <p class="modal-material" id="modal-material"></p>
+        </div>
+        <p class="modal-price"><span class="currency">₦</span><span id="modal-price"></span></p>
+        <div>
+          <p class="modal-label">Select Size</p>
+          <div class="size-grid" id="modal-sizes"></div>
+        </div>
+        <button class="modal-add-btn" id="modal-add-btn" onclick="addToCartFromModal()">ADD TO CART</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <span class="cart-title">CART</span>
+    <button class="cart-close-btn" onclick="closeCart()">×</button>
+  </div>
+  <div class="cart-items" id="cart-items-list"></div>
+  <div class="cart-footer" id="cart-footer" style="display:none;">
+    <div class="cart-total">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-price">₦<span id="cart-total-price">0</span></span>
+    </div>
+    <button class="checkout-btn" onclick="openCheckout()">PROCEED TO CHECKOUT</button>
+    <p class="checkout-note">
+      Payment via Paystack — Cards, Bank Transfer, USSD.<br/>
+      Delivery will be coordinated via WhatsApp after purchase.
+    </p>
+  </div>
+</div>
+
+<!-- CHECKOUT FORM -->
+<div class="checkout-overlay" id="checkout-overlay">
+  <div class="checkout-form-box">
+    <div class="checkout-form-header">
+      <span class="checkout-form-title">CHECKOUT</span>
+      <button class="modal-close" onclick="closeCheckout()">×</button>
+    </div>
+    <div class="checkout-form-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-input" id="c-firstname" placeholder="Emeka" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-input" id="c-lastname" placeholder="Okafor" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="c-email" placeholder="you@email.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input type="tel" class="form-input" id="c-phone" placeholder="08012345678" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Delivery Address</label>
+        <input type="text" class="form-input" id="c-address" placeholder="Your address for courier pickup coordination" />
+      </div>
+      <div style="border-top: 1px solid #222; padding-top: 16px;">
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--grey-text); margin-bottom:6px;">
+          <span>Order Total</span>
+          <span style="color:var(--white); font-weight:700;">₦<span id="checkout-total"></span></span>
+        </div>
+        <div style="font-size:9px; color:var(--grey-text); letter-spacing:0.1em; margin-bottom:16px;">
+          After payment, our team will contact you via WhatsApp to coordinate delivery.
+        </div>
+      </div>
+      <button class="pay-btn" onclick="initiatePaystack()">PAY WITH PAYSTACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEGAL OVERLAYS -->
+<div class="legal-overlay" id="legal-refund">
+  <div class="legal-inner">
+    <button class="legal-back" onclick="closeLegal('refund')">← BACK</button>
+    <h1 class="legal-title">REFUND POLICY</h1>
+    <div class="legal-content">
+      <h3>No Returns on Final Sale Items</h3>
+      <p>All sales are final unless the item received is defective or significantly different from what was ordered. We take quality seriously at ZISTHEFIRST and stand behind every piece we put out.</p>
+      <h3>Defective or Wrong Items</h3>
+      <p>If you receive a damaged, defective, or incorrect item, contact us within 48 hours of receiving your order via WhatsApp at +234 703 462 6602 with your order reference and photos of the issue.</p>
+      <h3>Exchange Policy</h3>
+      <p>We offer size exchanges subject to stock availability. Exchange requests must be made within 7 days of receiving the item. The customer bears the cost of returning the item for exchange.</p>
+      <h3>How Refunds Are Processed</h3>
+      <p>Approved refunds are processed back to the original payment method within 5–10 business days. You will receive a confirmation once the refund has been initiated.</p>
+      <h3>Contact</h3>
+      <p>For all refund and exchange inquiries: WhatsApp +234 703 462 6602 or email via contact on site.</p>
+    </div>
+  </div>
+</div>
+
+<div class="legal-overlay" id="legal-terms">
+  <div class="legal-inner">
+    <button class="legal-back" onclick="closeLegal('terms')">← BACK</button>
+    <h1 class="legal-title">TERMS & CONDITIONS</h1>
+    <div class="legal-content">
+      <h3>1. Acceptance of Terms</h3>
+      <p>By accessing and using the ZISTHEFIRST website and placing an order, you agree to these Terms and Conditions in full. If you do not agree, please do not use this site.</p>
+      <h3>2. Products</h3>
+      <p>All products are subject to availability. We reserve the right to discontinue any product at any time. Prices are listed in Nigerian Naira (₦) and are subject to change without notice.</p>
+      <h3>3. Orders & Payment</h3>
+      <p>Orders are confirmed only after successful payment via Paystack. You will receive an order confirmation. We reserve the right to cancel any order for any reason, in which case a full refund will be issued.</p>
+      <h3>4. Delivery</h3>
+      <p>Delivery is handled by third-party courier services. Delivery timelines are estimated and not guaranteed. ZISTHEFIRST is not responsible for delays caused by couriers or circumstances beyond our control.</p>
+      <h3>5. Intellectual Property</h3>
+      <p>All designs, logos, and branding on this site are the intellectual property of ZISTHEFIRST. Unauthorized use, reproduction or distribution is strictly prohibited.</p>
+      <h3>6. Limitation of Liability</h3>
+      <p>ZISTHEFIRST shall not be liable for any indirect, incidental, or consequential damages arising from your use of our products or services.</p>
+      <h3>7. Governing Law</h3>
+      <p>These terms are governed by the laws of the Federal Republic of Nigeria.</p>
+    </div>
+  </div>
+</div>
+
+<div class="legal-overlay" id="legal-privacy">
+  <div class="legal-inner">
+    <button class="legal-back" onclick="closeLegal('privacy')">← BACK</button>
+    <h1 class="legal-title">PRIVACY POLICY</h1>
+    <div class="legal-content">
+      <h3>What We Collect</h3>
+      <p>When you place an order or sign up for drop notifications, we collect your name, email address, phone number, and delivery address. This information is used solely to fulfill your order and communicate with you about your purchase.</p>
+      <h3>How We Use Your Data</h3>
+      <p>Your information is used to process orders, coordinate delivery, send drop notifications (if subscribed), and provide customer support. We do not sell or share your personal information with third parties except as required to fulfill your order (e.g., courier services).</p>
+      <h3>Payment Security</h3>
+      <p>All payments are processed securely by Paystack. ZISTHEFIRST does not store your card details. Please refer to Paystack's privacy policy for information on how payment data is handled.</p>
+      <h3>Email Communications</h3>
+      <p>If you subscribe to drop notifications, you may unsubscribe at any time by contacting us via WhatsApp or replying to any email. We will remove you from our list promptly.</p>
+      <h3>Data Retention</h3>
+      <p>We retain your order information for a period necessary to fulfill legal and business obligations. You may request deletion of your data by contacting us directly.</p>
+      <h3>Contact</h3>
+      <p>For privacy-related inquiries: WhatsApp +234 703 462 6602.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// PRODUCT DATA
+// ─────────────────────────────────────────────
+const products = [
+  {
+    id: 1,
+    name: "ZTF ALTERNATE WHITE TEE",
+    price: 23000,
+    material: "Plain Cotton",
+    sizes: ["M", "L", "XL"],
+    type: "always",
+    img: null,
+    tag: "Always Available"
+  },
+  {
+    id: 2,
+    name: "ZTF BLK T — THE TRIAL OF EREN YAEGER",
+    price: 30000,
+    material: "Plain Cotton",
+    sizes: ["M", "L", "XL"],
+    type: "always",
+    img: null,
+    tag: "Always Available"
+  },
+  {
+    id: 3,
+    name: "ZTF XANDER",
+    price: 25000,
+    material: "Plain Cotton",
+    sizes: ["M", "L", "XL"],
+    type: "always",
+    img: null,
+    tag: "Always Available"
+  },
+  {
+    id: 4,
+    name: "ZTF ALTERNATE BLACK HOODIE",
+    price: 25000,
+    material: "Plain Cotton",
+    sizes: ["M", "L", "XL"],
+    type: "always",
+    img: null,
+    tag: "Always Available"
+  },
+  {
+    id: 5,
+    name: "ZTF NEON SNAPBACK",
+    price: 15000,
+    material: "One Size Fits All",
+    sizes: ["ONE SIZE"],
+    type: "limited",
+    img: null,
+    tag: "Limited Drop"
+  }
+];
+
+// ─────────────────────────────────────────────
+// CART STATE
+// ─────────────────────────────────────────────
+let cart = [];
+let selectedSize = null;
+let currentProduct = null;
+
+function formatPrice(n) {
+  return n.toLocaleString('en-NG');
+}
+
+// ─────────────────────────────────────────────
+// RENDER PRODUCTS
+// ─────────────────────────────────────────────
+function renderProducts() {
+  const grid = document.getElementById('product-grid');
+  grid.innerHTML = products.map(p => `
+    <div class="product-card fade-in" onclick="openModal(${p.id})">
+      <div class="product-img-wrap">
+        <div class="product-img-placeholder">ZISTHEFIRST</div>
+        <span class="badge ${p.type === 'limited' ? 'badge-limited' : 'badge-available'}">
+          ${p.type === 'limited' ? 'LIMITED DROP' : 'IN STOCK'}
+        </span>
+      </div>
+      <div class="product-info">
+        <h3 class="product-name">${p.name}</h3>
+        <p class="product-material">${p.material} · ${p.sizes.join(' / ')}</p>
+        <p class="product-price"><span class="currency">₦</span>${formatPrice(p.price)}</p>
+      </div>
+    </div>
+  `).join('');
+  observeFadeIns();
+}
+
+// ─────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────
+function openModal(id) {
+  currentProduct = products.find(p => p.id === id);
+  selectedSize = null;
+
+  document.getElementById('modal-name').textContent = currentProduct.name;
+  document.getElementById('modal-material').textContent = currentProduct.material;
+  document.getElementById('modal-price').textContent = formatPrice(currentProduct.price);
+  document.getElementById('modal-badge').innerHTML = `<span class="badge ${currentProduct.type === 'limited' ? 'badge-limited' : 'badge-available'}">${currentProduct.tag}</span>`;
+
+  const sizesEl = document.getElementById('modal-sizes');
+  sizesEl.innerHTML = currentProduct.sizes.map(s =>
+    `<button class="size-btn ${s === 'ONE SIZE' ? 'one-size' : ''}" onclick="selectSize('${s}', this)">${s}</button>`
+  ).join('');
+
+  if (currentProduct.sizes.length === 1 && currentProduct.sizes[0] === 'ONE SIZE') {
+    selectedSize = 'ONE SIZE';
+    sizesEl.querySelector('.size-btn').classList.add('active');
+  }
+
+  const addBtn = document.getElementById('modal-add-btn');
+  addBtn.disabled = currentProduct.sizes.length > 1;
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function selectSize(size, btn) {
+  selectedSize = size;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('modal-add-btn').disabled = false;
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function addToCartFromModal() {
+  if (!selectedSize || !currentProduct) return;
+  const existing = cart.find(item => item.id === currentProduct.id && item.size === selectedSize);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ ...currentProduct, size: selectedSize, qty: 1 });
+  }
+  updateCartUI();
+  closeModal();
+  showToast(`${currentProduct.name.substring(0,20)}... ADDED`);
+}
+
+// ─────────────────────────────────────────────
+// CART
+// ─────────────────────────────────────────────
+function openCart() {
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('cart-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCart() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function updateCartUI() {
+  const count = cart.reduce((a, b) => a + b.qty, 0);
+  document.getElementById('cart-count').textContent = count;
+  const total = cart.reduce((a, b) => a + b.price * b.qty, 0);
+  document.getElementById('cart-total-price').textContent = formatPrice(total);
+  document.getElementById('checkout-total').textContent = formatPrice(total);
+
+  const list = document.getElementById('cart-items-list');
+  const footer = document.getElementById('cart-footer');
+
+  if (cart.length === 0) {
+    list.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">◻</div><p>Your cart is empty</p></div>`;
+    footer.style.display = 'none';
+  } else {
+    list.innerHTML = cart.map((item, i) => `
+      <div class="cart-item">
+        <div class="cart-item-img"><div class="product-img-placeholder" style="height:100%; font-size:7px;">ZTF</div></div>
+        <div>
+          <p class="cart-item-name">${item.name}</p>
+          <p class="cart-item-size">SIZE: ${item.size} · QTY: ${item.qty}</p>
+        </div>
+        <div style="text-align:right;">
+          <p class="cart-item-price">₦${formatPrice(item.price * item.qty)}</p>
+          <button class="cart-item-remove" onclick="removeFromCart(${i})">×</button>
+        </div>
+      </div>
+    `).join('');
+    footer.style.display = 'block';
+  }
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  updateCartUI();
+}
+
+// ─────────────────────────────────────────────
+// CHECKOUT
+// ─────────────────────────────────────────────
+function openCheckout() {
+  closeCart();
+  document.getElementById('checkout-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCheckout() {
+  document.getElementById('checkout-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function initiatePaystack() {
+  const email = document.getElementById('c-email').value.trim();
+  const firstname = document.getElementById('c-firstname').value.trim();
+  const lastname = document.getElementById('c-lastname').value.trim();
+  const phone = document.getElementById('c-phone').value.trim();
+  const address = document.getElementById('c-address').value.trim();
+
+  if (!email || !firstname || !lastname || !phone || !address) {
+    showToast('PLEASE FILL ALL FIELDS');
+    return;
+  }
+  if (!email.includes('@')) {
+    showToast('INVALID EMAIL ADDRESS');
+    return;
+  }
+
+  const total = cart.reduce((a, b) => a + b.price * b.qty, 0);
+  const orderSummary = cart.map(i => `${i.name} (${i.size}) x${i.qty}`).join(', ');
+
+  const handler = PaystackPop.setup({
+    key: 'pk_live_c9f7b59b07e5d9e0ee85bd3790bb3dd2f40cbe78',
+    email: email,
+    amount: total * 100, // Paystack uses kobo
+    currency: 'NGN',
+    ref: 'ZTF-' + Date.now(),
+    metadata: {
+      custom_fields: [
+        { display_name: "Customer Name", variable_name: "name", value: firstname + ' ' + lastname },
+        { display_name: "Phone", variable_name: "phone", value: phone },
+        { display_name: "Address", variable_name: "address", value: address },
+        { display_name: "Order", variable_name: "order", value: orderSummary }
+      ]
+    },
+    callback: function(response) {
+      closeCheckout();
+      cart = [];
+      updateCartUI();
+      showToast('ORDER CONFIRMED ✓');
+      setTimeout(() => {
+        alert(`ORDER CONFIRMED ✓\n\nRef: ${response.reference}\n\nOur team will contact you on WhatsApp at +234 703 462 6602 to arrange delivery.\n\nThank you for shopping ZISTHEFIRST.`);
+      }, 400);
+    },
+    onClose: function() {
+      showToast('PAYMENT CANCELLED');
+    }
+  });
+  handler.openIframe();
+}
+
+// ─────────────────────────────────────────────
+// EMAIL CAPTURE
+// ─────────────────────────────────────────────
+function submitEmail() {
+  const val = document.getElementById('email-input').value.trim();
+  if (!val || !val.includes('@')) { showToast('ENTER A VALID EMAIL'); return; }
+  document.getElementById('email-success').style.display = 'block';
+  document.getElementById('email-input').value = '';
+  showToast('YOU\'RE IN. WATCH YOUR INBOX.');
+}
+
+// ─────────────────────────────────────────────
+// LEGAL
+// ─────────────────────────────────────────────
+function openLegal(page) {
+  event.preventDefault();
+  document.getElementById('legal-' + page).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLegal(page) {
+  document.getElementById('legal-' + page).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ─────────────────────────────────────────────
+// FADE IN OBSERVER
+// ─────────────────────────────────────────────
+function observeFadeIns() {
+  const els = document.querySelectorAll('.fade-in');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(el => obs.observe(el));
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderProducts();
+  updateCartUI();
+  observeFadeIns();
+});
+</script>
+</body>
+</html>

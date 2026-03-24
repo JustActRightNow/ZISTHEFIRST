@@ -1578,9 +1578,20 @@ function initiatePaystack() {
 function submitEmail() {
   const val = document.getElementById('email-input').value.trim();
   if (!val || !val.includes('@')) { showToast('ENTER A VALID EMAIL'); return; }
-  document.getElementById('email-success').style.display = 'block';
-  document.getElementById('email-input').value = '';
-  showToast('YOU\'RE IN. WATCH YOUR INBOX.');
+  fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      'form-name': 'drop-signups',
+      'email': val
+    }).toString()
+  }).then(() => {
+    document.getElementById('email-success').style.display = 'block';
+    document.getElementById('email-input').value = '';
+    showToast("YOU'RE IN. WATCH YOUR INBOX.");
+  }).catch(() => {
+    showToast('SOMETHING WENT WRONG. TRY AGAIN.');
+  });
 }
 
 // ─────────────────────────────────────────────

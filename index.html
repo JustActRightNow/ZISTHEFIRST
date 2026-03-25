@@ -924,6 +924,120 @@
       .hero-scroll { display: none; }
     }
 
+    /* ─── LOOKBOOK MARQUEE ─── */
+    .lookbook {
+      width: 100%;
+      overflow: hidden;
+      background: var(--black);
+      padding: 0;
+      position: relative;
+      border-top: 1px solid #111;
+      border-bottom: 1px solid #111;
+    }
+    .lookbook-label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px 0;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--grey-text);
+    }
+    .lookbook-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #1a1a1a;
+    }
+    .lookbook-label span { color: var(--red); }
+    .lookbook-track-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 16px 0 0;
+    }
+    .lookbook-row {
+      display: flex;
+      width: max-content;
+      gap: 6px;
+      padding-bottom: 6px;
+    }
+    .lookbook-row.row-1 { animation: marquee-left 28s linear infinite; }
+    .lookbook-row.row-2 { animation: marquee-right 34s linear infinite; }
+    .lookbook-row:hover { animation-play-state: paused; }
+    @keyframes marquee-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes marquee-right {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0); }
+    }
+    .lookbook-item {
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .lookbook-item img {
+      height: 340px;
+      width: auto;
+      object-fit: cover;
+      display: block;
+      filter: grayscale(15%);
+      transition: filter 0.4s, transform 0.5s;
+    }
+    .lookbook-item:hover img {
+      filter: grayscale(0%);
+      transform: scale(1.03);
+    }
+    .lookbook-item-label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 32px 14px 12px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: var(--white);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .lookbook-item-price {
+      font-size: 10px;
+      color: var(--red);
+      font-family: var(--font-body);
+      margin-top: 2px;
+    }
+    .lookbook-item:hover .lookbook-item-label { opacity: 1; }
+    .lookbook-text-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow: hidden;
+      padding: 10px 0 16px;
+      border-top: 1px solid #0f0f0f;
+    }
+    .lookbook-text-scroll {
+      display: flex;
+      gap: 48px;
+      white-space: nowrap;
+      font-family: var(--font-display);
+      font-size: clamp(32px, 6vw, 56px);
+      letter-spacing: 0.04em;
+      animation: marquee-left 18s linear infinite;
+      color: transparent;
+      -webkit-text-stroke: 1px #1e1e1e;
+    }
+    .lookbook-text-scroll span.accent {
+      color: transparent;
+      -webkit-text-stroke: 1px var(--red);
+      opacity: 0.6;
+    }
+
     /* ─── FADE IN ─── */
     .fade-in {
       opacity: 0;
@@ -1047,6 +1161,130 @@
 </section>
 
 <div class="barcode-divider"></div>
+
+<!-- LOOKBOOK MARQUEE -->
+<div class="lookbook">
+  <div class="lookbook-label">
+    <span>ZTF</span> Lookbook — 2024
+  </div>
+  <div class="lookbook-track-wrap">
+
+    <!-- ROW 1 — scrolls left -->
+    <div class="lookbook-row row-1">
+      <!-- set 1 -->
+      <div class="lookbook-item" onclick="openModal(1)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png" alt="ZTF Alternate White Tee" />
+        <div class="lookbook-item-label">ZTF ALTERNATE WHITE TEE<div class="lookbook-item-price">₦23,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(2)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png" alt="ZTF Eren Yaeger" />
+        <div class="lookbook-item-label">THE TRIAL OF EREN YAEGER<div class="lookbook-item-price">₦30,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(3)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png" alt="ZTF Xander" />
+        <div class="lookbook-item-label">ZTF XANDER<div class="lookbook-item-price">₦25,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(4)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png" alt="ZTF Hoodie" />
+        <div class="lookbook-item-label">ZTF ALTERNATE BLACK HOODIE<div class="lookbook-item-price">₦25,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(5)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png" alt="ZTF Snapback" />
+        <div class="lookbook-item-label">ZTF NEON SNAPBACK<div class="lookbook-item-price">₦15,000</div></div>
+      </div>
+      <!-- set 2 — duplicate for seamless loop -->
+      <div class="lookbook-item" onclick="openModal(1)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png" alt="ZTF Alternate White Tee" />
+        <div class="lookbook-item-label">ZTF ALTERNATE WHITE TEE<div class="lookbook-item-price">₦23,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(2)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png" alt="ZTF Eren Yaeger" />
+        <div class="lookbook-item-label">THE TRIAL OF EREN YAEGER<div class="lookbook-item-price">₦30,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(3)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png" alt="ZTF Xander" />
+        <div class="lookbook-item-label">ZTF XANDER<div class="lookbook-item-price">₦25,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(4)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png" alt="ZTF Hoodie" />
+        <div class="lookbook-item-label">ZTF ALTERNATE BLACK HOODIE<div class="lookbook-item-price">₦25,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(5)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png" alt="ZTF Snapback" />
+        <div class="lookbook-item-label">ZTF NEON SNAPBACK<div class="lookbook-item-price">₦15,000</div></div>
+      </div>
+    </div>
+
+    <!-- ROW 2 — scrolls right, reversed order -->
+    <div class="lookbook-row row-2">
+      <!-- set 1 -->
+      <div class="lookbook-item" onclick="openModal(5)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png" alt="ZTF Snapback" />
+        <div class="lookbook-item-label">ZTF NEON SNAPBACK<div class="lookbook-item-price">₦15,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(4)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png" alt="ZTF Hoodie" />
+        <div class="lookbook-item-label">ZTF ALTERNATE BLACK HOODIE<div class="lookbook-item-price">₦25,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(3)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png" alt="ZTF Xander" />
+        <div class="lookbook-item-label">ZTF XANDER<div class="lookbook-item-price">₦25,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(2)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png" alt="ZTF Eren Yaeger" />
+        <div class="lookbook-item-label">THE TRIAL OF EREN YAEGER<div class="lookbook-item-price">₦30,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(1)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png" alt="ZTF Alternate White Tee" />
+        <div class="lookbook-item-label">ZTF ALTERNATE WHITE TEE<div class="lookbook-item-price">₦23,000</div></div>
+      </div>
+      <!-- set 2 — duplicate for seamless loop -->
+      <div class="lookbook-item" onclick="openModal(5)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png" alt="ZTF Snapback" />
+        <div class="lookbook-item-label">ZTF NEON SNAPBACK<div class="lookbook-item-price">₦15,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(4)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png" alt="ZTF Hoodie" />
+        <div class="lookbook-item-label">ZTF ALTERNATE BLACK HOODIE<div class="lookbook-item-price">₦25,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(3)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png" alt="ZTF Xander" />
+        <div class="lookbook-item-label">ZTF XANDER<div class="lookbook-item-price">₦25,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(2)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png" alt="ZTF Eren Yaeger" />
+        <div class="lookbook-item-label">THE TRIAL OF EREN YAEGER<div class="lookbook-item-price">₦30,000</div></div>
+      </div>
+      <div class="lookbook-item" onclick="openModal(1)">
+        <img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png" alt="ZTF Alternate White Tee" />
+        <div class="lookbook-item-label">ZTF ALTERNATE WHITE TEE<div class="lookbook-item-price">₦23,000</div></div>
+      </div>
+    </div>
+
+    <!-- TEXT ROW -->
+    <div class="lookbook-text-row">
+      <div class="lookbook-text-scroll">
+        <span>ZISTHEFIRST</span>
+        <span class="accent">★</span>
+        <span>IFUXS WITH IT</span>
+        <span class="accent">★</span>
+        <span>EST. 2024</span>
+        <span class="accent">★</span>
+        <span>LAGOS NG</span>
+        <span class="accent">★</span>
+        <span>ZISTHEFIRST</span>
+        <span class="accent">★</span>
+        <span>IFUXS WITH IT</span>
+        <span class="accent">★</span>
+        <span>EST. 2024</span>
+        <span class="accent">★</span>
+        <span>LAGOS NG</span>
+        <span class="accent">★</span>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <!-- SHOP -->
 <div class="section" id="shop">

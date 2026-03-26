@@ -125,18 +125,18 @@
     .product-price{font-family:var(--font-body);font-size:14px;font-weight:700;}
     .naira{color:var(--red);font-size:11px;font-weight:400;}
 
-    /* MODAL */
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;}
+    /* MODAL - mobile fix: full screen, close btn always visible */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:0;overflow-y:auto;}
     .modal-overlay.open{display:flex;}
-    .modal{background:var(--grey);width:100%;max-width:800px;max-height:90vh;overflow-y:auto;position:relative;border:1px solid #222;}
-    .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--white);font-size:24px;cursor:pointer;z-index:1;line-height:1;}
+    .modal{background:var(--grey);width:100%;max-width:800px;position:relative;border:1px solid #222;margin:auto;}
+    .modal-close{position:fixed;top:12px;right:12px;background:var(--red);border:none;color:var(--white);font-size:22px;cursor:pointer;z-index:2100;line-height:1;width:38px;height:38px;display:flex;align-items:center;justify-content:center;}
     .modal-inner{display:grid;grid-template-columns:1fr 1fr;}
     @media(max-width:600px){.modal-inner{grid-template-columns:1fr;}}
     .modal-img{aspect-ratio:1/1;background:#0a0a0a;overflow:hidden;}
     .modal-img img{width:100%;height:100%;object-fit:cover;}
     .modal-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;letter-spacing:0.15em;color:#222;}
-    .modal-details{padding:32px 24px;display:flex;flex-direction:column;gap:16px;}
-    .modal-name{font-family:var(--font-display);font-size:26px;letter-spacing:0.05em;line-height:1.1;}
+    .modal-details{padding:24px;display:flex;flex-direction:column;gap:14px;}
+    .modal-name{font-family:var(--font-display);font-size:24px;letter-spacing:0.05em;line-height:1.1;}
     .modal-price{font-size:20px;font-weight:700;}
     .modal-material{font-size:10px;color:var(--grey-text);letter-spacing:0.15em;text-transform:uppercase;}
     .modal-label{font-size:10px;letter-spacing:0.2em;color:var(--grey-text);text-transform:uppercase;margin-bottom:8px;}
@@ -144,7 +144,17 @@
     .size-btn{min-width:44px;height:44px;padding:0 10px;border:1px solid #333;background:none;color:var(--white);font-family:var(--font-body);font-size:10px;cursor:pointer;transition:all 0.15s;letter-spacing:0.05em;}
     .size-btn:hover{border-color:var(--white);}
     .size-btn.active{background:var(--red);border-color:var(--red);}
-    .modal-add-btn{background:var(--red);color:var(--white);border:none;font-family:var(--font-body);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;padding:16px;cursor:pointer;width:100%;margin-top:auto;transition:background 0.2s;}
+    /* Custom size input */
+    .custom-size-wrap{display:none;margin-top:8px;}
+    .custom-size-wrap.show{display:block;}
+    .custom-size-input{width:100%;background:var(--black);border:1px solid var(--red);color:var(--white);font-family:var(--font-body);font-size:12px;padding:10px 14px;outline:none;letter-spacing:0.08em;}
+    .custom-size-input::placeholder{color:#444;}
+    /* Qty controls in modal */
+    .modal-qty-row{display:flex;align-items:center;gap:0;border:1px solid #333;width:fit-content;}
+    .qty-btn{background:none;border:none;color:var(--white);font-size:18px;width:40px;height:40px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s;font-family:var(--font-body);}
+    .qty-btn:hover{background:rgba(204,0,0,0.15);color:var(--red);}
+    .qty-display{font-family:var(--font-body);font-size:14px;font-weight:700;min-width:36px;text-align:center;border-left:1px solid #333;border-right:1px solid #333;height:40px;display:flex;align-items:center;justify-content:center;}
+    .modal-add-btn{background:var(--red);color:var(--white);border:none;font-family:var(--font-body);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;padding:16px;cursor:pointer;width:100%;transition:background 0.2s;}
     .modal-add-btn:hover{background:#ff0000;}
     .modal-add-btn:disabled{background:#333;cursor:not-allowed;}
 
@@ -177,21 +187,23 @@
     .checkout-note{font-size:9px;color:var(--grey-text);letter-spacing:0.1em;text-align:center;line-height:1.6;}
 
     /* CHECKOUT */
-    .checkout-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:2500;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;}
+    .checkout-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.96);z-index:2500;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
     .checkout-overlay.open{display:flex;}
-    .checkout-form-box{background:var(--grey);width:100%;max-width:480px;border:1px solid #222;position:relative;margin:auto;}
-    .checkout-form-header{padding:24px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;}
+    .checkout-form-box{background:var(--grey);width:100%;max-width:480px;border:1px solid #222;position:relative;margin:auto;flex-shrink:0;}
+    .checkout-form-header{padding:20px 24px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--grey);z-index:10;}
     .checkout-form-title{font-family:var(--font-display);font-size:24px;letter-spacing:0.1em;}
-    .checkout-form-body{padding:24px;display:flex;flex-direction:column;gap:16px;}
+    .checkout-form-body{padding:20px;display:flex;flex-direction:column;gap:14px;}
     .form-group{display:flex;flex-direction:column;gap:6px;}
     .form-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--grey-text);}
-    .form-input{background:var(--black);border:1px solid #333;color:var(--white);font-family:var(--font-body);font-size:12px;padding:12px 14px;outline:none;transition:border-color 0.2s;}
+    .form-input{background:var(--black);border:1px solid #333;color:var(--white);font-family:var(--font-body);font-size:12px;padding:12px 14px;outline:none;transition:border-color 0.2s;width:100%;}
     .form-input:focus{border-color:var(--red);}
     .form-input::placeholder{color:#444;}
     .form-select{background:var(--black);border:1px solid #333;color:var(--white);font-family:var(--font-body);font-size:12px;padding:12px 14px;outline:none;cursor:pointer;appearance:none;transition:border-color 0.2s;width:100%;}
     .form-select:focus{border-color:var(--red);}
     .form-select option{background:var(--black);}
+    /* Always stack on mobile */
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:520px){.form-row{grid-template-columns:1fr;}}
     .order-summary-box{background:var(--black);border:1px solid #1a1a1a;padding:14px;}
     .order-line{display:flex;justify-content:space-between;font-size:10px;color:var(--grey-text);margin-bottom:6px;letter-spacing:0.05em;}
     .order-line.total{color:var(--white);font-weight:700;font-size:13px;border-top:1px solid #222;padding-top:10px;margin-top:4px;margin-bottom:0;}
@@ -267,8 +279,31 @@
     .legal-content h3{font-family:var(--font-display);font-size:20px;color:var(--white);margin:28px 0 10px;letter-spacing:0.05em;}
     .legal-content p{margin-bottom:14px;}
 
+    /* IFUXS TAGLINE STRIP */
+    .ifuxs-strip{background:var(--black);border-top:1px solid #111;border-bottom:1px solid #111;padding:18px 0;overflow:hidden;}
+    .ifuxs-inner{display:flex;gap:60px;white-space:nowrap;width:max-content;animation:ticker-slow 14s linear infinite;}
+    @keyframes ticker-slow{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+    .ifuxs-item{font-family:var(--font-display);font-size:clamp(22px,4vw,36px);letter-spacing:0.12em;color:transparent;-webkit-text-stroke:1px #333;}
+    .ifuxs-item.red{-webkit-text-stroke:1px var(--red);color:transparent;}
+    .ifuxs-item.solid{color:var(--white);-webkit-text-stroke:0;}
+
     /* MOBILE */
-    @media(max-width:600px){.nav-links,.nav-social{display:none;}nav{padding:0 16px;}.hero{padding:40px 16px;}.hero-scroll{display:none;}}
+    @media(max-width:600px){
+      .nav-links,.nav-social{display:none;}
+      nav{padding:0 16px;}
+      .hero{padding:40px 16px;}
+      .hero-scroll{display:none;}
+      /* Barcode SVG text spread fix */
+      .hero-barcode svg text{font-size:9px;letter-spacing:10px;}
+      /* Lookbook: show labels always on mobile (no hover) */
+      .lookbook-item-label{opacity:1;background:linear-gradient(transparent,rgba(0,0,0,0.9));}
+      .lookbook-item img{height:200px;}
+      /* Modal: full width no side padding */
+      .modal-overlay{padding:0;}
+      .modal{border-left:none;border-right:none;}
+      /* Cart: full width */
+      .cart-item-name{font-size:12px;}
+    }
 
     /* FADE IN */
     .fade-in{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease;}
@@ -372,6 +407,36 @@
   </div>
 </div>
 
+<!-- IFUXS TAGLINE STRIP -->
+<div class="ifuxs-strip">
+  <div class="ifuxs-inner">
+    <span class="ifuxs-item solid">I FUXS WITH IT</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item">ZISTHEFIRST</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item solid">I FUXS WITH IT</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item">EST. 2024</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item solid">I FUXS WITH IT</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item">LAGOS NG</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item solid">I FUXS WITH IT</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item">ZISTHEFIRST</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item solid">I FUXS WITH IT</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item">EST. 2024</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item solid">I FUXS WITH IT</span>
+    <span class="ifuxs-item red">★</span>
+    <span class="ifuxs-item">LAGOS NG</span>
+    <span class="ifuxs-item red">★</span>
+  </div>
+</div>
+
 <!-- SHOP -->
 <div class="section" id="shop">
   <div class="section-header fade-in">
@@ -384,7 +449,11 @@
   </div>
   <div class="filter-row">
     <button class="filter-btn active" onclick="setFilter('all',this)">ALL</button>
-    <button class="filter-btn" onclick="setFilter('always',this)">ALWAYS AVAILABLE</button>
+    <button class="filter-btn" onclick="setFilter('tee',this)">TEES</button>
+    <button class="filter-btn" onclick="setFilter('hoodie',this)">HOODIES</button>
+    <button class="filter-btn" onclick="setFilter('headwear',this)">HEADWEAR</button>
+    <button class="filter-btn" onclick="setFilter('polo',this)">POLOS</button>
+    <button class="filter-btn" onclick="setFilter('sweatshirt',this)">SWEATSHIRTS</button>
     <button class="filter-btn" onclick="setFilter('limited',this)">LIMITED DROPS</button>
   </div>
   <div class="product-grid" id="product-grid"></div>
@@ -492,6 +561,17 @@
         <div>
           <p class="modal-label">Select Size</p>
           <div class="size-grid" id="modal-sizes"></div>
+          <div class="custom-size-wrap" id="custom-size-wrap">
+            <input type="text" class="custom-size-input" id="custom-size-input" placeholder="Enter your measurements e.g. Chest 42, Length 28..." maxlength="120" />
+          </div>
+        </div>
+        <div>
+          <p class="modal-label">Quantity</p>
+          <div class="modal-qty-row">
+            <button class="qty-btn" onclick="changeQty(-1)">&#8722;</button>
+            <span class="qty-display" id="modal-qty">1</span>
+            <button class="qty-btn" onclick="changeQty(1)">&#43;</button>
+          </div>
         </div>
         <button class="modal-add-btn" id="modal-add-btn" onclick="addToCartFromModal()">ADD TO CART</button>
       </div>
@@ -531,6 +611,7 @@
       </div>
       <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" id="c-email" placeholder="you@email.com" maxlength="100"/></div>
       <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" class="form-input" id="c-phone" placeholder="08012345678" maxlength="15"/></div>
+      <div class="form-group"><label class="form-label">WhatsApp Number <span style="color:var(--grey-text);font-size:8px;">(if different from phone)</span></label><input type="tel" class="form-input" id="c-whatsapp" placeholder="08012345678 or leave blank if same" maxlength="15"/></div>
       <div class="form-group"><label class="form-label">Delivery Address</label><input type="text" class="form-input" id="c-address" placeholder="Full delivery address" maxlength="200"/></div>
       <div class="form-group">
         <label class="form-label">Delivery Option (GIG Logistics)</label>
@@ -606,26 +687,30 @@ function sanitize(str) {
 // The render/filter/search functions below handle async data.
 const CLOTHING_SIZES = ["M","L","XL","2XL","3XL","CUSTOM"];
 const products = [
-  {id:1,name:"ZTF ALTERNATE WHITE TEE",price:23000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png",tag:"Always Available"},
-  {id:2,name:"ZTF BLK T — THE TRIAL OF EREN YAEGER",price:30000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png",tag:"Always Available"},
-  {id:3,name:"ZTF XANDER",price:25000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png",tag:"Always Available"},
-  {id:4,name:"ZTF ALTERNATE BLACK HOODIE",price:25000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png",tag:"Always Available"},
-  {id:5,name:"ZTF NEON SNAPBACK",price:15000,material:"One Size Fits All",sizes:["ONE SIZE"],type:"limited",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png",tag:"Limited Drop"}
+  {id:1,name:"ZTF ALTERNATE WHITE TEE",price:23000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",category:"tee",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png",tag:"Always Available"},
+  {id:2,name:"ZTF BLK T — THE TRIAL OF EREN YAEGER",price:30000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",category:"tee",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png",tag:"Always Available"},
+  {id:3,name:"ZTF XANDER",price:25000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",category:"tee",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png",tag:"Always Available"},
+  {id:4,name:"ZTF ALTERNATE BLACK HOODIE",price:25000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",category:"hoodie",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png",tag:"Always Available"},
+  {id:5,name:"ZTF NEON SNAPBACK",price:15000,material:"One Size Fits All",sizes:["ONE SIZE"],type:"limited",category:"headwear",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png",tag:"Limited Drop"}
 ];
 
 // ── STATE ─────────────────────────────────────────────
-let cart=[], selectedSize=null, currentProduct=null;
+let cart=[], selectedSize=null, currentProduct=null, modalQty=1;
 let activeFilter='all', searchQuery='', searchTimeout=null, lastEmailSubmit=0;
 
 function formatPrice(n){return Number(n).toLocaleString('en-NG');}
 
 // ── FILTER & SEARCH ───────────────────────────────────
-// O(n) debounced at 250ms — stays fast at 1000 products
 function getFiltered(){
   const q=searchQuery.toLowerCase().trim();
+  const categoryFilters=['tee','hoodie','headwear','polo','sweatshirt','armless'];
   return products.filter(p=>{
-    const mf=activeFilter==='all'||p.type===activeFilter;
-    const ms=!q||p.name.toLowerCase().includes(q)||p.material.toLowerCase().includes(q);
+    let mf;
+    if(activeFilter==='all') mf=true;
+    else if(activeFilter==='limited') mf=p.type==='limited';
+    else if(categoryFilters.includes(activeFilter)) mf=p.category===activeFilter;
+    else mf=true;
+    const ms=!q||p.name.toLowerCase().includes(q)||p.material.toLowerCase().includes(q)||(p.category&&p.category.toLowerCase().includes(q));
     return mf&&ms;
   });
 }
@@ -676,7 +761,7 @@ function renderProducts(){
 function openModal(id){
   currentProduct=products.find(p=>p.id===id);
   if(!currentProduct)return;
-  selectedSize=null;
+  selectedSize=null;modalQty=1;
   document.getElementById('modal-name').textContent=currentProduct.name;
   document.getElementById('modal-material').textContent=currentProduct.material;
   document.getElementById('modal-price').textContent=formatPrice(currentProduct.price);
@@ -685,6 +770,11 @@ function openModal(id){
   imgC.innerHTML=currentProduct.img?`<img src="${currentProduct.img}" alt="${sanitize(currentProduct.name)}" style="width:100%;height:100%;object-fit:cover;"/>`:`<div class="modal-img-placeholder">ZISTHEFIRST</div>`;
   const sizesEl=document.getElementById('modal-sizes');
   sizesEl.innerHTML=currentProduct.sizes.map(s=>`<button class="size-btn" onclick="selectSize('${s}',this)">${s}</button>`).join('');
+  // Reset custom size field
+  document.getElementById('custom-size-wrap').classList.remove('show');
+  document.getElementById('custom-size-input').value='';
+  // Reset qty display
+  document.getElementById('modal-qty').textContent='1';
   const addBtn=document.getElementById('modal-add-btn');
   if(currentProduct.sizes.length===1){
     selectedSize=currentProduct.sizes[0];
@@ -699,13 +789,28 @@ function selectSize(size,btn){
   document.querySelectorAll('#modal-sizes .size-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('modal-add-btn').disabled=false;
+  // Show custom size input if CUSTOM selected
+  const wrap=document.getElementById('custom-size-wrap');
+  if(size==='CUSTOM'){wrap.classList.add('show');}
+  else{wrap.classList.remove('show');document.getElementById('custom-size-input').value='';}
+}
+function changeQty(delta){
+  modalQty=Math.max(1,Math.min(20,modalQty+delta));
+  document.getElementById('modal-qty').textContent=modalQty;
 }
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');document.body.style.overflow='';}
 function closeModalOnOverlay(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
 function addToCartFromModal(){
   if(!selectedSize||!currentProduct)return;
-  const ex=cart.find(i=>i.id===currentProduct.id&&i.size===selectedSize);
-  if(ex)ex.qty++;else cart.push({...currentProduct,size:selectedSize,qty:1});
+  let sizeLabel=selectedSize;
+  if(selectedSize==='CUSTOM'){
+    const cv=document.getElementById('custom-size-input').value.trim();
+    if(!cv){showToast('PLEASE ENTER YOUR CUSTOM MEASUREMENTS');return;}
+    sizeLabel='CUSTOM: '+cv.substring(0,60);
+  }
+  const ex=cart.find(i=>i.id===currentProduct.id&&i.size===sizeLabel);
+  if(ex)ex.qty+=modalQty;
+  else cart.push({...currentProduct,size:sizeLabel,qty:modalQty});
   updateCartUI();closeModal();
   showToast(`ADDED — ${currentProduct.name.substring(0,18)}...`);
 }
@@ -755,6 +860,7 @@ function initiatePaystack(){
   const firstname=sanitize(document.getElementById('c-firstname').value.trim());
   const lastname=sanitize(document.getElementById('c-lastname').value.trim());
   const phone=sanitize(document.getElementById('c-phone').value.trim());
+  const whatsapp=sanitize(document.getElementById('c-whatsapp').value.trim());
   const address=sanitize(document.getElementById('c-address').value.trim());
   const dEl=document.getElementById('c-delivery');
   const deliveryCost=parseInt(dEl.value);
@@ -766,6 +872,7 @@ function initiatePaystack(){
   const sub=cart.reduce((a,b)=>a+b.price*b.qty,0);
   const total=sub+deliveryCost;
   const orderSummary=cart.map(i=>`${i.name} (${i.size}) x${i.qty}`).join(', ');
+  const waContact=whatsapp||phone;
   const handler=PaystackPop.setup({
     key:'pk_live_c9f7b59b07e5d9e0ee85bd3790bb3dd2f40cbe78',
     email,amount:total*100,currency:'NGN',
@@ -773,13 +880,14 @@ function initiatePaystack(){
     metadata:{custom_fields:[
       {display_name:"Customer Name",variable_name:"name",value:firstname+' '+lastname},
       {display_name:"Phone",variable_name:"phone",value:phone},
+      {display_name:"WhatsApp",variable_name:"whatsapp",value:waContact},
       {display_name:"Address",variable_name:"address",value:address},
       {display_name:"Delivery",variable_name:"delivery",value:deliveryLabel},
       {display_name:"Order",variable_name:"order",value:orderSummary}
     ]},
     callback:function(res){
       closeCheckout();cart=[];updateCartUI();showToast('ORDER CONFIRMED \u2713');
-      setTimeout(()=>alert(`ORDER CONFIRMED \u2713\n\nRef: ${res.reference}\nDelivery: ${deliveryLabel}\n\nOur team will contact you on WhatsApp at +234 703 462 6602 to confirm your GIG delivery booking.\n\nThank you for shopping ZISTHEFIRST.`),400);
+      setTimeout(()=>alert(`ORDER CONFIRMED \u2713\n\nRef: ${res.reference}\nDelivery: ${deliveryLabel}\n\nOur team will contact you on WhatsApp (${waContact}) to confirm your GIG delivery booking.\n\nThank you for shopping ZISTHEFIRST.\nI FUXS WITH IT.`),400);
     },
     onClose:function(){showToast('PAYMENT CANCELLED');}
   });
@@ -886,8 +994,13 @@ function initLookbookRow(outerEl,rowEl,baseSpeed,direction){
 // ── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   renderProducts();updateCartUI();observeFadeIns();
-  initLookbookRow(document.getElementById('row1-outer'),document.getElementById('lookbook-row1'),1.8,1);
-  initLookbookRow(document.getElementById('row2-outer'),document.getElementById('lookbook-row2'),1.4,-1);
+  // Delay lookbook init until images settle — fixes row 1 blank on first load
+  const initLookbooks=()=>{
+    initLookbookRow(document.getElementById('row1-outer'),document.getElementById('lookbook-row1'),1.8,1);
+    initLookbookRow(document.getElementById('row2-outer'),document.getElementById('lookbook-row2'),1.4,-1);
+  };
+  if(document.readyState==='complete'){initLookbooks();}
+  else{window.addEventListener('load',initLookbooks);}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeCart();closeCheckout();}});
 </script>

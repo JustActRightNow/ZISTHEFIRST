@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --black:#000000;--white:#ffffff;--red:#cc0000;
@@ -58,6 +59,43 @@
     .hero-bg-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:clamp(80px,22vw,280px);color:transparent;-webkit-text-stroke:1px #1a1a1a;white-space:nowrap;pointer-events:none;user-select:none;letter-spacing:-0.02em;}
     .hero-barcode{width:min(580px,92%);margin-bottom:24px;}
     .hero-barcode svg{width:100%;height:auto;}
+    /* CSS text row under barcode — reliable on all devices */
+    .barcode-text-row{display:flex;width:100%;justify-content:space-between;margin-top:6px;font-family:var(--font-body);font-size:clamp(10px,2.5vw,14px);font-weight:700;letter-spacing:0.25em;}
+    .barcode-text-white{color:var(--white);}
+    .barcode-text-red{color:var(--red);}
+
+    /* PRODUCT FLIP */
+    .product-img-wrap{aspect-ratio:1/1;overflow:hidden;background:#0a0a0a;position:relative;perspective:800px;}
+    .flip-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 0.7s cubic-bezier(0.4,0,0.2,1);}
+    .product-card:hover .flip-inner{transform:rotateY(180deg);}
+    .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
+    .flip-front img,.flip-back img{width:100%;height:100%;object-fit:cover;transition:transform 0.5s;}
+    .flip-back{transform:rotateY(180deg);background:#0d0d0d;display:flex;align-items:center;justify-content:center;}
+    .flip-back-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;}
+    .flip-back-name{font-family:var(--font-display);font-size:16px;letter-spacing:0.08em;color:var(--white);line-height:1.1;}
+    .flip-back-price{font-family:var(--font-body);font-size:13px;font-weight:700;color:var(--red);}
+    .flip-back-tag{font-size:9px;letter-spacing:0.2em;color:var(--grey-text);text-transform:uppercase;margin-top:4px;}
+    .flip-back-cta{font-size:9px;letter-spacing:0.2em;color:var(--white);text-transform:uppercase;border:1px solid #444;padding:6px 14px;margin-top:8px;}
+
+    /* NEW DROPS SECTION */
+    .drops-section{background:var(--black);padding:80px 24px;border-top:2px solid var(--red);}
+    .drops-inner{max-width:1200px;margin:0 auto;}
+    .drops-eyebrow{font-size:9px;letter-spacing:0.3em;color:var(--red);text-transform:uppercase;margin-bottom:12px;}
+    .drops-headline{font-family:var(--font-display);font-size:clamp(40px,8vw,80px);line-height:0.95;margin-bottom:8px;}
+    .drops-sub{font-size:11px;color:var(--grey-text);letter-spacing:0.1em;margin-bottom:48px;max-width:480px;}
+    .drops-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2px;}
+    .drop-card{background:var(--grey2);position:relative;overflow:hidden;border:1px solid #1a1a1a;}
+    .drop-card-img{aspect-ratio:3/4;background:#0a0a0a;overflow:hidden;position:relative;}
+    .drop-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s;}
+    .drop-card:hover .drop-card-img img{transform:scale(1.05);}
+    .drop-card-coming{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+    .drop-card-coming-label{font-family:var(--font-display);font-size:28px;letter-spacing:0.1em;color:#1a1a1a;}
+    .drop-date-badge{position:absolute;top:12px;right:12px;background:var(--red);color:var(--white);font-size:8px;letter-spacing:0.2em;padding:5px 10px;text-transform:uppercase;}
+    .drop-card-info{padding:20px;}
+    .drop-card-name{font-family:var(--font-display);font-size:22px;letter-spacing:0.06em;margin-bottom:6px;}
+    .drop-card-desc{font-size:10px;color:var(--grey-text);letter-spacing:0.08em;line-height:1.6;margin-bottom:16px;}
+    .drop-notify-btn{background:none;border:1px solid var(--red);color:var(--red);font-family:var(--font-body);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;padding:10px 20px;cursor:pointer;transition:all 0.2s;width:100%;}
+    .drop-notify-btn:hover{background:var(--red);color:var(--white);}
     .hero-eyebrow{font-size:10px;letter-spacing:0.3em;color:var(--grey-text);text-transform:uppercase;margin-bottom:12px;}
     .hero-headline{font-family:var(--font-display);font-size:clamp(52px,12vw,120px);line-height:0.9;letter-spacing:0.02em;margin-bottom:24px;}
     .hero-headline span{color:var(--red);}
@@ -112,9 +150,6 @@
     .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px;}
     .product-card{background:var(--grey);cursor:pointer;position:relative;overflow:hidden;transition:transform 0.3s;}
     .product-card:hover{transform:translateY(-4px);}
-    .product-card:hover .product-img-wrap img{transform:scale(1.04);}
-    .product-img-wrap{aspect-ratio:1/1;overflow:hidden;background:#0a0a0a;position:relative;}
-    .product-img-wrap img{object-fit:cover;height:100%;transition:transform 0.5s;}
     .product-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0d0d0d;font-family:var(--font-display);font-size:13px;letter-spacing:0.15em;color:#222;}
     .badge{position:absolute;top:12px;left:12px;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:4px 8px;}
     .badge-limited{background:var(--red);color:var(--white);}
@@ -315,16 +350,17 @@
 <div class="announce">
   <span class="announce-inner">
     DELIVERY: IN-LAGOS &#8358;3,000 &nbsp;&#9733;&nbsp; OUT-LAGOS &#8358;4,000 &nbsp;&#9733;&nbsp; GIG NATIONWIDE &#8358;7,500 &nbsp;&#9733;&nbsp;
-    ZISTHEFIRST EST. 2024 &nbsp;&#9733;&nbsp; IFUXS WITH IT &nbsp;&#9733;&nbsp; NEW DROPS COMING SOON &nbsp;&#9733;&nbsp;
+    ZISTHEFIRST — ESTABLISHED 2026 &nbsp;&#9733;&nbsp; I FUXS WITH IT &nbsp;&#9733;&nbsp; NEW DROPS COMING SOON &nbsp;&#9733;&nbsp;
   </span>
 </div>
 
 <nav>
-  <div class="nav-logo">ZIS<span>THE</span>FIRST</div>
+  <div class="nav-logo">ZISTHE<span>FIRST</span></div>
   <ul class="nav-links">
     <li><a href="#shop">Shop</a></li>
+    <li><a href="#new-drops">New Drops</a></li>
     <li><a href="#about">About</a></li>
-    <li><a href="#drops">Drops</a></li>
+    <li><a href="#drops">Drop List</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-right">
@@ -343,19 +379,21 @@
 <section class="hero">
   <div class="hero-bg-text">ZTF</div>
   <div class="hero-barcode">
-    <svg viewBox="0 0 600 82" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 600 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
       <g fill="white" opacity="0.9">
         <rect x="0" y="0" width="3" height="56"/><rect x="6" y="0" width="1" height="56"/><rect x="10" y="0" width="4" height="56"/><rect x="17" y="0" width="2" height="56"/><rect x="22" y="0" width="1" height="56"/><rect x="26" y="0" width="3" height="56"/><rect x="32" y="0" width="1" height="56"/><rect x="36" y="0" width="4" height="56"/><rect x="43" y="0" width="2" height="56"/><rect x="48" y="0" width="1" height="56"/><rect x="52" y="0" width="3" height="56"/><rect x="58" y="0" width="2" height="56"/><rect x="63" y="0" width="1" height="56"/><rect x="67" y="0" width="4" height="56"/><rect x="74" y="0" width="1" height="56"/><rect x="78" y="0" width="3" height="56"/><rect x="84" y="0" width="2" height="56"/><rect x="89" y="0" width="1" height="56"/><rect x="93" y="0" width="4" height="56"/><rect x="100" y="0" width="1" height="56"/><rect x="104" y="0" width="2" height="56"/><rect x="109" y="0" width="3" height="56"/><rect x="115" y="0" width="1" height="56"/><rect x="119" y="0" width="4" height="56"/><rect x="126" y="0" width="2" height="56"/><rect x="131" y="0" width="1" height="56"/><rect x="135" y="0" width="3" height="56"/><rect x="141" y="0" width="1" height="56"/><rect x="145" y="0" width="2" height="56"/><rect x="150" y="0" width="4" height="56"/><rect x="157" y="0" width="1" height="56"/><rect x="161" y="0" width="3" height="56"/><rect x="167" y="0" width="2" height="56"/><rect x="172" y="0" width="1" height="56"/><rect x="176" y="0" width="4" height="56"/><rect x="183" y="0" width="2" height="56"/><rect x="188" y="0" width="1" height="56"/><rect x="192" y="0" width="3" height="56"/><rect x="198" y="0" width="1" height="56"/><rect x="202" y="0" width="2" height="56"/><rect x="207" y="0" width="4" height="56"/><rect x="214" y="0" width="1" height="56"/><rect x="218" y="0" width="3" height="56"/><rect x="224" y="0" width="2" height="56"/><rect x="229" y="0" width="1" height="56"/><rect x="233" y="0" width="4" height="56"/><rect x="240" y="0" width="1" height="56"/><rect x="244" y="0" width="3" height="56"/><rect x="250" y="0" width="2" height="56"/><rect x="255" y="0" width="1" height="56"/><rect x="259" y="0" width="4" height="56"/><rect x="266" y="0" width="2" height="56"/><rect x="271" y="0" width="1" height="56"/><rect x="275" y="0" width="3" height="56"/><rect x="281" y="0" width="1" height="56"/><rect x="285" y="0" width="2" height="56"/><rect x="290" y="0" width="4" height="56"/><rect x="297" y="0" width="1" height="56"/>
       </g>
       <g fill="#cc0000" opacity="0.95">
         <rect x="303" y="0" width="3" height="56"/><rect x="309" y="0" width="1" height="56"/><rect x="313" y="0" width="4" height="56"/><rect x="320" y="0" width="2" height="56"/><rect x="325" y="0" width="1" height="56"/><rect x="329" y="0" width="3" height="56"/><rect x="335" y="0" width="1" height="56"/><rect x="339" y="0" width="4" height="56"/><rect x="346" y="0" width="2" height="56"/><rect x="351" y="0" width="1" height="56"/><rect x="355" y="0" width="3" height="56"/><rect x="361" y="0" width="2" height="56"/><rect x="366" y="0" width="1" height="56"/><rect x="370" y="0" width="4" height="56"/><rect x="377" y="0" width="1" height="56"/><rect x="381" y="0" width="3" height="56"/><rect x="387" y="0" width="2" height="56"/><rect x="392" y="0" width="1" height="56"/><rect x="396" y="0" width="4" height="56"/><rect x="403" y="0" width="1" height="56"/><rect x="407" y="0" width="2" height="56"/><rect x="412" y="0" width="3" height="56"/><rect x="418" y="0" width="1" height="56"/><rect x="422" y="0" width="4" height="56"/><rect x="429" y="0" width="2" height="56"/><rect x="434" y="0" width="1" height="56"/><rect x="438" y="0" width="3" height="56"/><rect x="444" y="0" width="1" height="56"/><rect x="448" y="0" width="2" height="56"/><rect x="453" y="0" width="4" height="56"/><rect x="460" y="0" width="1" height="56"/><rect x="464" y="0" width="3" height="56"/><rect x="470" y="0" width="2" height="56"/><rect x="475" y="0" width="1" height="56"/><rect x="479" y="0" width="4" height="56"/><rect x="486" y="0" width="2" height="56"/><rect x="491" y="0" width="1" height="56"/><rect x="495" y="0" width="3" height="56"/><rect x="501" y="0" width="1" height="56"/><rect x="505" y="0" width="4" height="56"/><rect x="512" y="0" width="2" height="56"/><rect x="517" y="0" width="1" height="56"/><rect x="521" y="0" width="3" height="56"/><rect x="527" y="0" width="4" height="56"/><rect x="534" y="0" width="1" height="56"/><rect x="538" y="0" width="3" height="56"/><rect x="544" y="0" width="2" height="56"/><rect x="549" y="0" width="1" height="56"/><rect x="553" y="0" width="4" height="56"/><rect x="560" y="0" width="2" height="56"/><rect x="565" y="0" width="1" height="56"/><rect x="569" y="0" width="3" height="56"/><rect x="575" y="0" width="1" height="56"/><rect x="579" y="0" width="2" height="56"/><rect x="584" y="0" width="4" height="56"/><rect x="591" y="0" width="1" height="56"/><rect x="595" y="0" width="3" height="56"/>
       </g>
-      <!-- Text spread across full barcode width -->
-      <text font-family="'Space Mono',monospace" font-size="11" font-weight="700" y="76" x="1" textLength="597" lengthAdjust="spacing"><tspan fill="white">ZISTHE</tspan><tspan fill="#cc0000">FIRST</tspan></text>
     </svg>
+    <!-- CSS text row below barcode — works on ALL devices unlike SVG textLength -->
+    <div class="barcode-text-row">
+      <span class="barcode-text-white">ZISTHE</span><span class="barcode-text-red">FIRST</span>
+    </div>
   </div>
-  <p class="hero-eyebrow">EST. 2024 — LAGOS, NIGERIA</p>
-  <h1 class="hero-headline">ZIS<span>THE</span><br/>FIRST.</h1>
+  <p class="hero-eyebrow">ESTABLISHED 2026 — LAGOS, NIGERIA</p>
+  <h1 class="hero-headline">ZIS<span>THE</span><br/>FIRST</h1>
   <p class="hero-sub">Streetwear built different. Made for the ones who move first.</p>
   <div class="hero-ctas">
     <button class="btn-primary" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">SHOP NOW</button>
@@ -368,7 +406,7 @@
 
 <!-- LOOKBOOK -->
 <div class="lookbook">
-  <div class="lookbook-label"><span>ZTF</span> Lookbook — 2024</div>
+  <div class="lookbook-label"><span>ZTF</span> Lookbook — <span id="lookbook-year"></span></div>
   <div class="lookbook-track-wrap">
     <div class="lookbook-row-outer" id="row1-outer">
       <div class="lookbook-row" id="lookbook-row1">
@@ -466,8 +504,55 @@
     <div class="about-stats fade-in">
       <div class="stat-box"><div class="stat-number">24<span>/7</span></div><div class="stat-label">Always Available</div></div>
       <div class="stat-box"><div class="stat-number"><span>&#8358;</span></div><div class="stat-label">Naira Pricing</div></div>
-      <div class="stat-box"><div class="stat-number">01</div><div class="stat-label">Est. 2024</div></div>
+      <div class="stat-box"><div class="stat-number">01</div><div class="stat-label">Established 2026</div></div>
       <div class="stat-box"><div class="stat-number">NG</div><div class="stat-label">Lagos, Nigeria</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="barcode-divider red"></div>
+
+<!-- NEW DROPS -->
+<div class="drops-section" id="new-drops">
+  <div class="drops-inner">
+    <div class="fade-in">
+      <p class="drops-eyebrow">&#9632; New Drops</p>
+      <h2 class="drops-headline">WHAT'S<br/>DROPPING</h2>
+      <p class="drops-sub">Limited collections. Once they're gone, they're gone. Sign up below to get notified before anyone else.</p>
+    </div>
+    <div class="drops-grid fade-in">
+      <!-- ACTIVE DROP EXAMPLE — replace img src when a real drop is ready -->
+      <div class="drop-card">
+        <div class="drop-card-img">
+          <div class="drop-card-coming">
+            <div style="font-family:var(--font-display);font-size:clamp(28px,6vw,52px);color:#1a1a1a;letter-spacing:0.1em;">COMING SOON</div>
+            <div style="width:60%;height:1px;background:#1a1a1a;"></div>
+            <div style="font-size:9px;color:#222;letter-spacing:0.2em;text-transform:uppercase;">Next Collection</div>
+          </div>
+          <div class="drop-date-badge">DROPPING SOON</div>
+        </div>
+        <div class="drop-card-info">
+          <p class="drop-card-name">COLLECTION 002</p>
+          <p class="drop-card-desc">The next ZTF drop is in the works. Limited pieces. No restocks. Sign up to the drop list below to be first in line.</p>
+          <button class="drop-notify-btn" onclick="document.getElementById('drops').scrollIntoView({behavior:'smooth'})">NOTIFY ME WHEN IT DROPS</button>
+        </div>
+      </div>
+      <!-- PLACEHOLDER 2 -->
+      <div class="drop-card">
+        <div class="drop-card-img">
+          <div class="drop-card-coming">
+            <div style="font-family:var(--font-display);font-size:clamp(28px,6vw,52px);color:#1a1a1a;letter-spacing:0.1em;">TBA</div>
+            <div style="width:40%;height:1px;background:#1a1a1a;"></div>
+            <div style="font-size:9px;color:#222;letter-spacing:0.2em;text-transform:uppercase;">Collab Drop</div>
+          </div>
+          <div class="drop-date-badge" style="background:#111;border:1px solid #333;color:var(--grey-text);">UNANNOUNCED</div>
+        </div>
+        <div class="drop-card-info">
+          <p class="drop-card-name">COLLAB ??</p>
+          <p class="drop-card-desc">Something is in the works. Stay locked in. First to know wins first dibs.</p>
+          <button class="drop-notify-btn" onclick="document.getElementById('drops').scrollIntoView({behavior:'smooth'})">GET ON THE LIST</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -495,8 +580,8 @@
   <div class="footer-inner">
     <div class="footer-top">
       <div>
-        <div class="footer-brand-name">ZIS<span>THE</span>FIRST</div>
-        <p class="footer-brand-tagline">Lagos-born streetwear.<br/>For the ones who move first.<br/><br/>Orders &amp; support via WhatsApp.<br/>Delivery via GIG Logistics.</p>
+        <div class="footer-brand-name">ZISTHE<span>FIRST</span></div>
+        <p class="footer-brand-tagline">Lagos-born streetwear.<br/>I FUXS WITH IT.<br/><br/>Orders &amp; support via WhatsApp.<br/>Delivery via GIG Logistics.</p>
         <div class="footer-social">
           <a href="https://instagram.com/zisthefirst" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
@@ -527,8 +612,8 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p class="footer-copy">&copy; 2024 ZISTHEFIRST. All rights reserved.</p>
-      <p class="footer-est">EST. <span>2024</span> — LAGOS, NG</p>
+      <p class="footer-copy">&copy; <span id="footer-year"></span> ZISTHEFIRST. All rights reserved.</p>
+      <p class="footer-est">ESTABLISHED <span>2026</span> — LAGOS, NG</p>
     </div>
   </div>
 </footer>
@@ -620,7 +705,7 @@
         <div class="order-line"><span>Delivery</span><span>&#8358;<span id="summary-delivery">3,000</span></span></div>
         <div class="order-line total"><span>Total</span><span><span class="naira">&#8358;</span><span id="summary-total">0</span></span></div>
       </div>
-      <p class="delivery-note">After payment, our team will contact you on WhatsApp to confirm your GIG delivery booking and share tracking details.</p>
+      <p class="delivery-note">&#9432; Delivery takes <strong style="color:var(--white);">3–5 business days</strong> via GIG Logistics. After payment, our team will contact you on WhatsApp to confirm your booking and share tracking details.</p>
       <button class="pay-btn" onclick="initiatePaystack()">PAY WITH PAYSTACK</button>
     </div>
   </div>
@@ -675,24 +760,57 @@ function sanitize(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;').slice(0,300);
 }
 
+// ── SUPABASE CLIENT ───────────────────────────────────
+const { createClient } = supabase;
+const sb = createClient(
+  'https://pynncutrkndfjukimenj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5bm5jdXRya25kZmp1a2ltZW5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNDc5ODcsImV4cCI6MjA4OTkyMzk4N30.q4t573IgMD1P7YZnpmg2i-scSbTZAWfb0JUnKQwWy4g'
+);
+
 // ── PRODUCT DATA ──────────────────────────────────────
-// SCALE NOTE: At 50+ products, migrate this array to
-// Supabase and replace with: fetch('/api/products').then(...)
-// The render/filter/search functions below handle async data.
+// Products are now fetched from Supabase.
+// CLOTHING_SIZES kept as fallback default only.
 const CLOTHING_SIZES = ["M","L","XL","2XL","3XL","CUSTOM"];
-const products = [
-  {id:1,name:"ZTF ALTERNATE WHITE TEE",price:23000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",category:"tee",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png",tag:"Always Available"},
-  {id:2,name:"ZTF BLK T — THE TRIAL OF EREN YAEGER",price:30000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",category:"tee",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png",tag:"Always Available"},
-  {id:3,name:"ZTF XANDER",price:25000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",category:"tee",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png",tag:"Always Available"},
-  {id:4,name:"ZTF ALTERNATE BLACK HOODIE",price:25000,material:"Plain Cotton",sizes:CLOTHING_SIZES,type:"always",category:"hoodie",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png",tag:"Always Available"},
-  {id:5,name:"ZTF NEON SNAPBACK",price:15000,material:"One Size Fits All",sizes:["ONE SIZE"],type:"limited",category:"headwear",img:"https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png",tag:"Limited Drop"}
-];
+let products = []; // populated by fetchProducts()
 
 // ── STATE ─────────────────────────────────────────────
 let cart=[], selectedSize=null, currentProduct=null, modalQty=1;
 let activeFilter='all', searchQuery='', searchTimeout=null, lastEmailSubmit=0;
 
 function formatPrice(n){return Number(n).toLocaleString('en-NG');}
+
+// ── FETCH PRODUCTS FROM SUPABASE ──────────────────────
+async function fetchProducts() {
+  const grid = document.getElementById('product-grid');
+  const label = document.getElementById('product-count-label');
+  grid.innerHTML = `<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;padding:60px;gap:14px;color:var(--grey-text);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;">
+    <div style="width:18px;height:18px;border:2px solid #222;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;"></div>
+    LOADING PRODUCTS...
+  </div>`;
+  const { data, error } = await sb.from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error || !data) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--grey-text);font-size:10px;letter-spacing:0.15em;">COULD NOT LOAD PRODUCTS. PLEASE REFRESH.</div>`;
+    return;
+  }
+  // Normalise Supabase shape to match what the rest of the code expects
+  products = data.map(p => ({
+    id:       p.id,
+    name:     p.name,
+    price:    p.price,
+    material: p.material || 'Plain Cotton',
+    sizes:    Array.isArray(p.sizes) ? p.sizes : JSON.parse(p.sizes || '[]'),
+    type:     p.type,
+    category: p.category,
+    img:      p.img_front || '',
+    imgBack:  p.img_back  || '',
+    tag:      p.tag || (p.type === 'limited' ? 'Limited Drop' : 'Always Available'),
+    inStock:  p.in_stock !== false
+  }));
+  label.textContent = `${products.length} Product${products.length !== 1 ? 's' : ''}`;
+  renderProducts();
+}
 
 // ── FILTER & SEARCH ───────────────────────────────────
 function getFiltered(){
@@ -736,8 +854,23 @@ function renderProducts(){
     card.onclick=()=>openModal(p.id);
     card.innerHTML=`
       <div class="product-img-wrap">
-        ${p.img?`<img src="${p.img}" alt="${sanitize(p.name)}" loading="lazy" decoding="async"/>`:`<div class="product-img-placeholder">ZISTHEFIRST</div>`}
-        <span class="badge ${p.type==='limited'?'badge-limited':'badge-available'}">${p.type==='limited'?'LIMITED DROP':'IN STOCK'}</span>
+        <div class="flip-inner">
+          <div class="flip-front">
+            ${p.img?`<img src="${p.img}" alt="${sanitize(p.name)}" loading="lazy" decoding="async"/>`:`<div class="product-img-placeholder">ZISTHEFIRST</div>`}
+          </div>
+          <div class="flip-back">
+            ${p.imgBack
+              ? `<img src="${p.imgBack}" alt="${sanitize(p.name)} back" loading="lazy" decoding="async"/>`
+              : `<div class="flip-back-placeholder">
+                  <div class="flip-back-name">${sanitize(p.name)}</div>
+                  <div class="flip-back-price">&#8358;${formatPrice(p.price)}</div>
+                  <div class="flip-back-tag">${sanitize(p.material)}</div>
+                  <div class="flip-back-cta">TAP TO VIEW</div>
+                </div>`
+            }
+          </div>
+        </div>
+        <span class="badge ${p.type==='limited'?'badge-limited':p.inStock===false?'badge-available':'badge-available'}">${p.type==='limited'?'LIMITED DROP':p.inStock===false?'OUT OF STOCK':'IN STOCK'}</span>
       </div>
       <div class="product-info">
         <h3 class="product-name">${sanitize(p.name)}</h3>
@@ -880,24 +1013,53 @@ function initiatePaystack(){
       {display_name:"Order",variable_name:"order",value:orderSummary}
     ]},
     callback:function(res){
+      // Save order to Supabase
+      const orderPayload = {
+        paystack_ref:       res.reference,
+        customer_name:      firstname + ' ' + lastname,
+        customer_email:     email,
+        customer_phone:     phone,
+        customer_whatsapp:  waContact,
+        delivery_address:   address,
+        delivery_option:    deliveryLabel,
+        delivery_cost:      deliveryCost,
+        items:              JSON.stringify(cart.map(i=>({name:i.name,size:i.size,qty:i.qty,price:i.price}))),
+        subtotal:           sub,
+        total:              total,
+        status:             'confirmed'
+      };
+      sb.from('orders').insert([orderPayload]);
       closeCheckout();cart=[];updateCartUI();showToast('ORDER CONFIRMED \u2713');
-      setTimeout(()=>alert(`ORDER CONFIRMED \u2713\n\nRef: ${res.reference}\nDelivery: ${deliveryLabel}\n\nOur team will contact you on WhatsApp (${waContact}) to confirm your GIG delivery booking.\n\nThank you for shopping ZISTHEFIRST.\nI FUXS WITH IT.`),400);
+      setTimeout(()=>alert(`ORDER CONFIRMED \u2713\n\nRef: ${res.reference}\nDelivery: ${deliveryLabel}\n\nOur team will contact you on WhatsApp (${waContact}) to confirm your GIG delivery booking.\n\nExpect delivery within 3–5 business days.\n\nThank you for shopping ZISTHEFIRST.\nI FUXS WITH IT.`),400);
     },
     onClose:function(){showToast('PAYMENT CANCELLED');}
   });
   handler.openIframe();
 }
 
-// ── EMAIL CAPTURE — rate limited 1 per 60s ────────────
+// ── EMAIL CAPTURE ─────────────────────────────────────
 function submitEmail(){
   const now=Date.now();
   if(now-lastEmailSubmit<60000){showToast('PLEASE WAIT BEFORE RESUBMITTING');return;}
   const val=document.getElementById('email-input').value.trim();
   if(!val||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)){showToast('ENTER A VALID EMAIL');return;}
   const hp=document.querySelector('.hp-field');if(hp&&hp.value)return;
-  fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({'form-name':'drop-signups','email':val}).toString()})
-    .then(()=>{lastEmailSubmit=Date.now();document.getElementById('email-success').style.display='block';document.getElementById('email-input').value='';showToast("YOU'RE IN. WATCH YOUR INBOX.");})
-    .catch(()=>showToast('SOMETHING WENT WRONG. TRY AGAIN.'));
+  // Save to Supabase (primary) + Netlify Forms (backup)
+  Promise.all([
+    sb.from('email_signups').insert([{ email: val }]),
+    fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({'form-name':'drop-signups','email':val}).toString()})
+  ]).then(()=>{
+    lastEmailSubmit=Date.now();
+    document.getElementById('email-success').style.display='block';
+    document.getElementById('email-input').value='';
+    showToast("YOU'RE IN. WATCH YOUR INBOX.");
+  }).catch(()=>{
+    // Even if Netlify fails, Supabase likely succeeded
+    lastEmailSubmit=Date.now();
+    document.getElementById('email-success').style.display='block';
+    document.getElementById('email-input').value='';
+    showToast("YOU'RE IN. WATCH YOUR INBOX.");
+  });
 }
 
 // ── LEGAL ─────────────────────────────────────────────
@@ -917,86 +1079,107 @@ function observeFadeIns(){
 }
 
 // ── LOOKBOOK DRAG SCROLL ──────────────────────────────
-// direction: 1=left, -1=right. Infinite wrap at halfWidth.
-// Manual drag transfers velocity to momentum on release.
-function initLookbookRow(outerEl,rowEl,baseSpeed,direction){
-  let pos=0,velocity=0,isDragging=false,lastX=0,lastTime=0,halfWidth=0;
-  // Init right-direction row at midpoint so it starts correctly
-  setTimeout(()=>{halfWidth=rowEl.scrollWidth/2;if(direction===-1)pos=-halfWidth/2;},100);
-  function tick(){
-    halfWidth=rowEl.scrollWidth/2||halfWidth;
-    if(!isDragging){
-      // Smooth ease toward target auto-speed — higher multiplier = snappier
-      velocity=velocity*0.96+baseSpeed*direction*0.04;
-    } else {
-      // Slight friction while dragging to keep control
-      velocity*=0.85;
-    }
-    // Clamp velocity so manual drag can't go insanely fast
-    velocity=Math.max(-28,Math.min(28,velocity));
-    pos+=velocity;
-    // Infinite wrap — clamp back when half-set has scrolled fully
-    if(halfWidth>0){
-      if(direction===1&&pos<=-halfWidth)pos+=halfWidth;
-      if(direction===-1&&pos>=0)pos-=halfWidth;
-      // Safety net for edge cases
-      if(Math.abs(pos)>halfWidth*2)pos=0;
-    }
-    rowEl.style.transform=`translateX(${pos}px)`;
+// Pure position-based infinite loop. Each row has 2 identical
+// sets of items. Row1 scrolls left (pos goes negative).
+// Row2 scrolls right (pos goes positive from -halfWidth start).
+// On every frame: if pos crosses the halfway mark, snap back
+// by exactly halfWidth — making the loop invisible.
+function initLookbookRow(outerEl, rowEl, baseSpeed, direction) {
+  if (!outerEl || !rowEl) return;
+  let pos = 0, velocity = 0, isDragging = false;
+  let lastX = 0, lastTime = 0, halfWidth = 0, started = false;
+
+  function getHalfWidth() {
+    return rowEl.scrollWidth / 2;
+  }
+
+  function start() {
+    halfWidth = getHalfWidth();
+    if (halfWidth < 10) { setTimeout(start, 100); return; } // wait for layout
+    // Row 2 starts at middle so it appears to scroll rightward
+    if (direction === -1) pos = -halfWidth;
+    started = true;
     requestAnimationFrame(tick);
   }
-  tick();
 
-  // ── MOUSE DRAG ───────────────────────────────────────
-  outerEl.addEventListener('mousedown',e=>{
-    isDragging=true;lastX=e.clientX;lastTime=performance.now();
-    outerEl.style.cursor='grabbing';e.preventDefault();
-  });
-  window.addEventListener('mousemove',e=>{
-    if(!isDragging)return;
-    const now=performance.now();
-    const dx=e.clientX-lastX;
-    const dt=now-lastTime||1;
-    // Higher multiplier (28) = fast, responsive drag
-    velocity=(dx/dt)*28;
-    pos+=dx;
-    lastX=e.clientX;lastTime=now;
-  });
-  window.addEventListener('mouseup',()=>{
-    if(!isDragging)return;
-    isDragging=false;
-    outerEl.style.cursor='grab';
-    // Momentum decays slowly (0.97) so it coasts after release
-  });
+  function tick() {
+    if (!started) return;
+    halfWidth = getHalfWidth() || halfWidth;
 
-  // ── TOUCH DRAG ───────────────────────────────────────
-  outerEl.addEventListener('touchstart',e=>{
-    isDragging=true;lastX=e.touches[0].clientX;lastTime=performance.now();
-  },{passive:true});
-  outerEl.addEventListener('touchmove',e=>{
-    if(!isDragging)return;
-    const now=performance.now();
-    const dx=e.touches[0].clientX-lastX;
-    const dt=now-lastTime||1;
-    velocity=(dx/dt)*28;
-    pos+=dx;
-    lastX=e.touches[0].clientX;lastTime=now;
-  },{passive:true});
-  outerEl.addEventListener('touchend',()=>{isDragging=false;});
+    if (!isDragging) {
+      // Ease velocity toward target speed
+      velocity += (baseSpeed * direction - velocity) * 0.05;
+    } else {
+      velocity *= 0.88;
+    }
+
+    // Hard clamp — prevents runaway on aggressive drag
+    velocity = Math.max(-32, Math.min(32, velocity));
+    pos += velocity;
+
+    // Seamless wrap — snap by exactly one set when boundary crossed
+    if (direction === 1 && pos <= -halfWidth) pos += halfWidth;
+    if (direction === -1 && pos >= 0) pos -= halfWidth;
+
+    rowEl.style.transform = `translateX(${pos}px)`;
+    requestAnimationFrame(tick);
+  }
+
+  // ── MOUSE ──
+  outerEl.addEventListener('mousedown', e => {
+    isDragging = true; lastX = e.clientX; lastTime = performance.now();
+    outerEl.style.cursor = 'grabbing'; e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const now = performance.now(), dx = e.clientX - lastX, dt = now - lastTime || 1;
+    velocity = (dx / dt) * 22; pos += dx;
+    lastX = e.clientX; lastTime = now;
+  });
+  window.addEventListener('mouseup', () => { isDragging = false; outerEl.style.cursor = 'grab'; });
+
+  // ── TOUCH ──
+  outerEl.addEventListener('touchstart', e => {
+    isDragging = true; lastX = e.touches[0].clientX; lastTime = performance.now();
+  }, { passive: true });
+  outerEl.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const now = performance.now(), dx = e.touches[0].clientX - lastX, dt = now - lastTime || 1;
+    velocity = (dx / dt) * 22; pos += dx;
+    lastX = e.touches[0].clientX; lastTime = now;
+  }, { passive: true });
+  outerEl.addEventListener('touchend', () => { isDragging = false; });
+
+  // Start after fonts + images have loaded
+  if (document.readyState === 'complete') { start(); }
+  else { window.addEventListener('load', start); }
 }
 
 // ── INIT ──────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{
-  renderProducts();updateCartUI();observeFadeIns();
-  // Delay lookbook init until images settle — fixes row 1 blank on first load
-  const initLookbooks=()=>{
-    initLookbookRow(document.getElementById('row1-outer'),document.getElementById('lookbook-row1'),1.8,1);
-    initLookbookRow(document.getElementById('row2-outer'),document.getElementById('lookbook-row2'),1.4,-1);
-  };
-  if(document.readyState==='complete'){initLookbooks();}
-  else{window.addEventListener('load',initLookbooks);}
+document.addEventListener('DOMContentLoaded', () => {
+  // Dynamic year
+  const yr = new Date().getFullYear();
+  const lyEl = document.getElementById('lookbook-year');
+  const fyEl = document.getElementById('footer-year');
+  if (lyEl) lyEl.textContent = yr;
+  if (fyEl) fyEl.textContent = yr;
+
+  // Fetch products from Supabase, then render
+  fetchProducts();
+  updateCartUI(); observeFadeIns();
+
+  initLookbookRow(
+    document.getElementById('row1-outer'),
+    document.getElementById('lookbook-row1'), 1.6, 1
+  );
+  initLookbookRow(
+    document.getElementById('row2-outer'),
+    document.getElementById('lookbook-row2'), 1.2, -1
+  );
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeCart();closeCheckout();}});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeCart(); closeCheckout(); }
+});
 </script>
 </body>
 </html>

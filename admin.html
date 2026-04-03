@@ -324,13 +324,24 @@ tr:hover td{background:#080808;}
 <script>
 'use strict';
 
-const SB_URL  = 'https://pynncutrkndfjukimenj.supabase.co';
-const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5bm5jdXRya25kZmp1a2ltZW5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNDc5ODcsImV4cCI6MjA4OTkyMzk4N30.q4t573IgMD1P7YZnpmg2i-scSbTZAWfb0JUnKQwWy4g';
-const CLD_NAME   = 'dadjmvc82';
-const CLD_PRESET = 'ztf_unsigned'; // create this in Cloudinary → Settings → Upload → Upload presets → Add unsigned preset
-
 const { createClient } = supabase;
-const sb = createClient(SB_URL, SB_ANON);
+let sb = null;
+const CLD_NAME   = 'dadjmvc82';
+const CLD_PRESET = 'ztf_unsigned';
+
+// ── LOAD CONFIG & BOOT ───────────────────────────────
+async function loadConfigAndBoot() {
+  try {
+    const res = await fetch('/.netlify/functions/get-config');
+    const cfg = await res.json();
+    sb = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    checkSession();
+  } catch (err) {
+    console.error('Config load failed', err);
+    document.querySelector('.login-box').innerHTML =
+      '<p style="color:#cc0000;font-size:11px;letter-spacing:0.1em;">Could not connect to server. Please refresh.</p>';
+  }
+}
 
 let allProds = [], filtered = [], page = 0;
 const PER = 20;
@@ -678,7 +689,7 @@ function toast(msg, ok = false) {
 document.getElementById('l-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-checkSession();
+loadConfigAndBoot();
 </script>
 </body>
 </html>

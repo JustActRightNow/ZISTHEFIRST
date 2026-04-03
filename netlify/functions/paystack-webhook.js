@@ -9,8 +9,7 @@
 
 const crypto = require('crypto');
 
-const SUPABASE_URL  = 'https://pynncutrkndfjukimenj.supabase.co';
-const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY; // service_role key — server side only
+// All config comes from Netlify environment variables — nothing hardcoded
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -91,12 +90,15 @@ exports.handler = async (event) => {
   // Using upsert with onConflict='paystack_ref' means:
   // - If frontend already saved it, this is a no-op (safe)
   // - If frontend failed (browser crash), this saves it (recovery)
-  const supaRes = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+
+  const supaRes = await fetch(`${supabaseUrl}/rest/v1/orders`, {
     method: 'POST',
     headers: {
       'Content-Type':  'application/json',
-      'apikey':        SUPABASE_KEY || process.env.SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY || process.env.SUPABASE_ANON_KEY}`,
+      'apikey':        supabaseKey,
+      'Authorization': `Bearer ${supabaseKey}`,
       'Prefer':        'resolution=ignore-duplicates'
     },
     body: JSON.stringify({

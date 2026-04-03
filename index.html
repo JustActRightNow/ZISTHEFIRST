@@ -1012,6 +1012,12 @@ function initiatePaystack(){
     ]},
     callback:function(res){
       // Save order to Supabase (frontend path)
+      const orderItems = cart.map(i => ({
+        name:  i.name,
+        size:  i.size,
+        qty:   i.qty,
+        price: i.price
+      }));
       const orderPayload = {
         paystack_ref:       res.reference,
         customer_name:      firstname + ' ' + lastname,
@@ -1021,14 +1027,18 @@ function initiatePaystack(){
         delivery_address:   address,
         delivery_option:    deliveryLabel,
         delivery_cost:      deliveryCost,
-        items:              JSON.stringify(cart.map(i=>({name:i.name,size:i.size,qty:i.qty,price:i.price}))),
+        items:              orderItems,  // real array — Supabase jsonb handles this
         subtotal:           sub,
         total:              total,
         status:             'confirmed'
       };
-      sb.from('orders').insert([orderPayload]);
 
-      // Send confirmation email via Netlify function
+      // Save order — await so we can log errors
+      sb.from('orders').insert([orderPayload]).then(({ error }) => {
+        if (error) console.error('Order insert error:', error.message, error.details);
+      });
+
+      // Send branded confirmation email
       fetch('/.netlify/functions/send-order-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1040,16 +1050,18 @@ function initiatePaystack(){
           delivery_address:   address,
           delivery_option:    deliveryLabel,
           delivery_cost:      deliveryCost,
-          items:              cart.map(i=>({name:i.name,size:i.size,qty:i.qty,price:i.price})),
+          items:              orderItems,
           subtotal:           sub,
           total:              total,
           paystack_ref:       res.reference
         })
-      }).catch(err => console.warn('Email function error:', err));
+      }).then(r => {
+        if (!r.ok) r.json().then(d => console.warn('Email error:', d));
+      }).catch(err => console.warn('Email function unreachable:', err));
 
       closeCheckout(); cart=[]; updateCartUI(); showToast('ORDER CONFIRMED \u2713');
       setTimeout(()=>alert(
-        `ORDER CONFIRMED \u2713\n\nRef: ${res.reference}\nDelivery: ${deliveryLabel}\n\nA confirmation email has been sent to ${email}.\n\nOur team will also contact you on WhatsApp (${waContact}) to confirm your GIG delivery booking.\n\nExpect delivery within 3\u20135 business days.\n\nThank you for shopping ZISTHEFIRST.\nI FUXS WITH IT.`
+        `ORDER CONFIRMED \u2713\n\nRef: ${res.reference}\nDelivery: ${deliveryLabel}\n\nA confirmation email will be sent to ${email}.\n\nOur team will also contact you on WhatsApp (${waContact}) to arrange your GIG delivery.\n\nExpect delivery within 3\u20135 business days.\n\nThank you for shopping ZISTHEFIRST.\nI FUXS WITH IT.`
       ), 400);
     },
     onClose:function(){showToast('PAYMENT CANCELLED');}

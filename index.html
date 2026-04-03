@@ -761,17 +761,15 @@ function sanitize(str) {
 }
 
 // ── SUPABASE CLIENT ───────────────────────────────────
+// Keys loaded at runtime from /.netlify/functions/get-config
+// Nothing sensitive lives in this file
 const { createClient } = supabase;
-const sb = createClient(
-  'https://pynncutrkndfjukimenj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5bm5jdXRya25kZmp1a2ltZW5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNDc5ODcsImV4cCI6MjA4OTkyMzk4N30.q4t573IgMD1P7YZnpmg2i-scSbTZAWfb0JUnKQwWy4g'
-);
+let sb = null; // initialised after config loads
+let PAYSTACK_PK = ''; // loaded from config
 
 // ── PRODUCT DATA ──────────────────────────────────────
-// Products are now fetched from Supabase.
-// CLOTHING_SIZES kept as fallback default only.
 const CLOTHING_SIZES = ["M","L","XL","2XL","3XL","CUSTOM"];
-let products = []; // populated by fetchProducts()
+let products = [];
 
 // ── STATE ─────────────────────────────────────────────
 let cart=[], selectedSize=null, currentProduct=null, modalQty=1;
@@ -1001,7 +999,7 @@ function initiatePaystack(){
   const orderSummary=cart.map(i=>`${i.name} (${i.size}) x${i.qty}`).join(', ');
   const waContact=whatsapp||phone;
   const handler=PaystackPop.setup({
-    key:'pk_live_c9f7b59b07e5d9e0ee85bd3790bb3dd2f40cbe78',
+    key: PAYSTACK_PK,
     email,amount:total*100,currency:'NGN',
     ref:'ZTF-'+Date.now()+'-'+Math.random().toString(36).substr(2,5).toUpperCase(),
     metadata:{custom_fields:[
@@ -1178,7 +1176,9 @@ function initLookbookRow(outerEl, rowEl, baseSpeed, direction) {
 }
 
 // ── INIT ──────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+// Fetch config first (removes all hardcoded keys from this file),
+// then boot the rest of the app
+async function init() {
   // Dynamic year
   const yr = new Date().getFullYear();
   const lyEl = document.getElementById('lookbook-year');
@@ -1186,9 +1186,24 @@ document.addEventListener('DOMContentLoaded', () => {
   if (lyEl) lyEl.textContent = yr;
   if (fyEl) fyEl.textContent = yr;
 
-  // Fetch products from Supabase, then render
+  // Load config from server — no keys in this file
+  try {
+    const res  = await fetch('/.netlify/functions/get-config');
+    const cfg  = await res.json();
+    sb = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+    PAYSTACK_PK = cfg.paystackPublicKey || '';
+  } catch (err) {
+    console.error('Config load failed:', err);
+    document.getElementById('product-grid').innerHTML =
+      `<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--grey-text);font-size:10px;letter-spacing:0.15em;">
+        COULD NOT CONNECT. PLEASE REFRESH THE PAGE.
+      </div>`;
+    return;
+  }
+
   fetchProducts();
-  updateCartUI(); observeFadeIns();
+  updateCartUI();
+  observeFadeIns();
 
   initLookbookRow(
     document.getElementById('row1-outer'),
@@ -1198,7 +1213,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('row2-outer'),
     document.getElementById('lookbook-row2'), 1.2, -1
   );
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { closeModal(); closeCart(); closeCheckout(); }
 });

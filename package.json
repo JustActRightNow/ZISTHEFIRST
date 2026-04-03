@@ -1,0 +1,9 @@
+{
+  "name": "zisthefirst",
+  "version": "1.0.0",
+  "description": "ZISTHEFIRST Official Store",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": true
+}

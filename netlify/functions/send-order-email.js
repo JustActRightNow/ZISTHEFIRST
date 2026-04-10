@@ -226,7 +226,7 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from:    'ZISTHEFIRST <onboarding@resend.dev>',
+        from:    'ZISTHEFIRST <orders@zisthefirst.com>',
         to:      [customer_email],
         subject: `Order Confirmed — ${paystack_ref} | ZISTHEFIRST`,
         html:    htmlEmail

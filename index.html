@@ -60,9 +60,10 @@
     .hero-barcode{width:min(580px,92%);margin-bottom:24px;}
     .hero-barcode svg{width:100%;height:auto;}
     /* CSS text row under barcode — reliable on all devices */
-    .barcode-text-row{display:flex;width:100%;justify-content:space-between;margin-top:6px;font-family:var(--font-body);font-size:clamp(10px,2.5vw,14px);font-weight:700;letter-spacing:0.25em;}
-    .barcode-text-white{color:var(--white);}
-    .barcode-text-red{color:var(--red);}
+    .barcode-text-row{display:flex;width:100%;margin-top:6px;font-family:var(--font-body);font-size:clamp(10px,2.5vw,14px);font-weight:700;}
+    .barcode-text-white{flex:0 0 calc(298/600*100%);display:flex;justify-content:space-between;color:var(--white);}
+    .barcode-text-gap{flex:0 0 calc(5/600*100%);}
+    .barcode-text-red{flex:0 0 calc(295/600*100%);display:flex;justify-content:space-between;color:var(--red);}
 
     /* PRODUCT FLIP */
     .product-img-wrap{aspect-ratio:1/1;overflow:hidden;background:#0a0a0a;position:relative;perspective:800px;}
@@ -350,7 +351,7 @@
 <div class="announce">
   <span class="announce-inner">
     DELIVERY: IN-LAGOS &#8358;3,000 &nbsp;&#9733;&nbsp; OUT-LAGOS &#8358;4,000 &nbsp;&#9733;&nbsp; GIG NATIONWIDE &#8358;7,500 &nbsp;&#9733;&nbsp;
-    ZISTHEFIRST — ESTABLISHED 2026 &nbsp;&#9733;&nbsp; I FUXS WITH IT &nbsp;&#9733;&nbsp; NEW DROPS COMING SOON &nbsp;&#9733;&nbsp;
+    ZISTHEFIRST — ESTABLISHED 2024 &nbsp;&#9733;&nbsp; I FUXS WITH IT &nbsp;&#9733;&nbsp; NEW DROPS COMING SOON &nbsp;&#9733;&nbsp;
   </span>
 </div>
 
@@ -389,10 +390,12 @@
     </svg>
     <!-- CSS text row below barcode — works on ALL devices unlike SVG textLength -->
     <div class="barcode-text-row">
-      <span class="barcode-text-white">ZISTHE</span><span class="barcode-text-red">FIRST</span>
+      <span class="barcode-text-white"><span>Z</span><span>I</span><span>S</span><span>T</span><span>H</span><span>E</span></span>
+      <span class="barcode-text-gap"></span>
+      <span class="barcode-text-red"><span>F</span><span>I</span><span>R</span><span>S</span><span>T</span></span>
     </div>
   </div>
-  <p class="hero-eyebrow">ESTABLISHED 2026 — LAGOS, NIGERIA</p>
+  <p class="hero-eyebrow">ESTABLISHED 2024 — LAGOS, NIGERIA</p>
   <h1 class="hero-headline">ZIS<span>THE</span><br/>FIRST</h1>
   <p class="hero-sub">Streetwear built different. Made for the ones who move first.</p>
   <div class="hero-ctas">
@@ -409,32 +412,10 @@
   <div class="lookbook-label"><span>ZTF</span> Lookbook — <span id="lookbook-year"></span></div>
   <div class="lookbook-track-wrap">
     <div class="lookbook-row-outer" id="row1-outer">
-      <div class="lookbook-row" id="lookbook-row1">
-        <div class="lookbook-item" onclick="openModal(1)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png" alt="ZTF White Tee"/><div class="lookbook-item-label">ZTF ALTERNATE WHITE TEE<div class="lookbook-item-price">&#8358;23,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(2)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png" alt="ZTF Eren"/><div class="lookbook-item-label">TRIAL OF EREN YAEGER<div class="lookbook-item-price">&#8358;30,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(3)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png" alt="ZTF Xander"/><div class="lookbook-item-label">ZTF XANDER<div class="lookbook-item-price">&#8358;25,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(4)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png" alt="ZTF Hoodie"/><div class="lookbook-item-label">ZTF ALTERNATE BLACK HOODIE<div class="lookbook-item-price">&#8358;25,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(5)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png" alt="ZTF Snapback"/><div class="lookbook-item-label">ZTF NEON SNAPBACK<div class="lookbook-item-price">&#8358;15,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(1)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png" alt="ZTF White Tee"/><div class="lookbook-item-label">ZTF ALTERNATE WHITE TEE<div class="lookbook-item-price">&#8358;23,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(2)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png" alt="ZTF Eren"/><div class="lookbook-item-label">TRIAL OF EREN YAEGER<div class="lookbook-item-price">&#8358;30,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(3)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png" alt="ZTF Xander"/><div class="lookbook-item-label">ZTF XANDER<div class="lookbook-item-price">&#8358;25,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(4)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png" alt="ZTF Hoodie"/><div class="lookbook-item-label">ZTF ALTERNATE BLACK HOODIE<div class="lookbook-item-price">&#8358;25,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(5)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png" alt="ZTF Snapback"/><div class="lookbook-item-label">ZTF NEON SNAPBACK<div class="lookbook-item-price">&#8358;15,000</div></div></div>
-      </div>
+      <div class="lookbook-row" id="lookbook-row1"></div>
     </div>
     <div class="lookbook-row-outer" id="row2-outer">
-      <div class="lookbook-row" id="lookbook-row2">
-        <div class="lookbook-item" onclick="openModal(5)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png" alt="ZTF Snapback"/><div class="lookbook-item-label">ZTF NEON SNAPBACK<div class="lookbook-item-price">&#8358;15,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(4)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png" alt="ZTF Hoodie"/><div class="lookbook-item-label">ZTF ALTERNATE BLACK HOODIE<div class="lookbook-item-price">&#8358;25,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(3)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png" alt="ZTF Xander"/><div class="lookbook-item-label">ZTF XANDER<div class="lookbook-item-price">&#8358;25,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(2)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png" alt="ZTF Eren"/><div class="lookbook-item-label">TRIAL OF EREN YAEGER<div class="lookbook-item-price">&#8358;30,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(1)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png" alt="ZTF White Tee"/><div class="lookbook-item-label">ZTF ALTERNATE WHITE TEE<div class="lookbook-item-price">&#8358;23,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(5)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png" alt="ZTF Snapback"/><div class="lookbook-item-label">ZTF NEON SNAPBACK<div class="lookbook-item-price">&#8358;15,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(4)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png" alt="ZTF Hoodie"/><div class="lookbook-item-label">ZTF ALTERNATE BLACK HOODIE<div class="lookbook-item-price">&#8358;25,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(3)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png" alt="ZTF Xander"/><div class="lookbook-item-label">ZTF XANDER<div class="lookbook-item-price">&#8358;25,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(2)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png" alt="ZTF Eren"/><div class="lookbook-item-label">TRIAL OF EREN YAEGER<div class="lookbook-item-price">&#8358;30,000</div></div></div>
-        <div class="lookbook-item" onclick="openModal(1)"><img src="https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png" alt="ZTF White Tee"/><div class="lookbook-item-label">ZTF ALTERNATE WHITE TEE<div class="lookbook-item-price">&#8358;23,000</div></div></div>
-      </div>
+      <div class="lookbook-row" id="lookbook-row2"></div>
     </div>
   </div>
 </div>
@@ -479,13 +460,15 @@
     <input type="text" class="search-input" id="search-input" placeholder="SEARCH PRODUCTS..." autocomplete="off" oninput="debounceSearch()" />
     <span class="search-icon">&#9906;</span>
   </div>
-  <div class="filter-row">
+  <div class="filter-row" id="filter-row">
     <button class="filter-btn active" onclick="setFilter('all',this)">ALL</button>
     <button class="filter-btn" onclick="setFilter('tee',this)">TEES</button>
     <button class="filter-btn" onclick="setFilter('hoodie',this)">HOODIES</button>
     <button class="filter-btn" onclick="setFilter('headwear',this)">HEADWEAR</button>
     <button class="filter-btn" onclick="setFilter('polo',this)">POLOS</button>
     <button class="filter-btn" onclick="setFilter('sweatshirt',this)">SWEATSHIRTS</button>
+    <button class="filter-btn" onclick="setFilter('jersey',this)">JERSEYS</button>
+    <button class="filter-btn" onclick="setFilter('pants',this)">PANTS</button>
     <button class="filter-btn" onclick="setFilter('limited',this)">LIMITED DROPS</button>
   </div>
   <div class="product-grid" id="product-grid"></div>
@@ -504,7 +487,7 @@
     <div class="about-stats fade-in">
       <div class="stat-box"><div class="stat-number">24<span>/7</span></div><div class="stat-label">Always Available</div></div>
       <div class="stat-box"><div class="stat-number"><span>&#8358;</span></div><div class="stat-label">Naira Pricing</div></div>
-      <div class="stat-box"><div class="stat-number">01</div><div class="stat-label">Established 2026</div></div>
+      <div class="stat-box"><div class="stat-number">01</div><div class="stat-label">Established 2024</div></div>
       <div class="stat-box"><div class="stat-number">NG</div><div class="stat-label">Lagos, Nigeria</div></div>
     </div>
   </div>
@@ -771,11 +754,77 @@ let PAYSTACK_PK = ''; // loaded from config
 const CLOTHING_SIZES = ["M","L","XL","2XL","3XL","CUSTOM"];
 let products = [];
 
+// ── DEFAULT CATEGORIES (fallback if Supabase unavailable) ─────────────────
+const DEFAULT_CATEGORIES = [
+  {slug:'tee',label:'TEES'},
+  {slug:'hoodie',label:'HOODIES'},
+  {slug:'headwear',label:'HEADWEAR'},
+  {slug:'polo',label:'POLOS'},
+  {slug:'sweatshirt',label:'SWEATSHIRTS'},
+  {slug:'armless',label:'ARMLESS'},
+  {slug:'jersey',label:'JERSEYS'},
+  {slug:'pants',label:'PANTS'}
+];
+
+// ── DEFAULT LOOKBOOK (fallback if Supabase unavailable) ───────────────────
+const DEFAULT_LOOKBOOK = [
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png',alt:'ZTF White Tee',label:'ZTF ALTERNATE WHITE TEE'},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png',alt:'ZTF Eren',label:'TRIAL OF EREN YAEGER'},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png',alt:'ZTF Xander',label:'ZTF XANDER'},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png',alt:'ZTF Hoodie',label:'ZTF ALTERNATE BLACK HOODIE'},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png',alt:'ZTF Snapback',label:'ZTF NEON SNAPBACK'}
+];
+
 // ── STATE ─────────────────────────────────────────────
 let cart=[], selectedSize=null, currentProduct=null, modalQty=1;
 let activeFilter='all', searchQuery='', searchTimeout=null, lastEmailSubmit=0;
 
 function formatPrice(n){return Number(n).toLocaleString('en-NG');}
+
+// ── LOAD CATEGORIES FROM SUPABASE ────────────────────
+async function loadCategories() {
+  let cats = DEFAULT_CATEGORIES;
+  try {
+    const { data } = await sb.from('categories').select('*').order('sort_order', { ascending: true });
+    if (data && data.length) cats = data;
+  } catch(e) {}
+  const filterRow = document.getElementById('filter-row');
+  if (!filterRow) return;
+  const catBtns = cats.map(c =>
+    `<button class="filter-btn" onclick="setFilter('${sanitize(c.slug)}',this)">${sanitize(c.label)}</button>`
+  ).join('');
+  filterRow.innerHTML =
+    `<button class="filter-btn active" onclick="setFilter('all',this)">ALL</button>` +
+    catBtns +
+    `<button class="filter-btn" onclick="setFilter('limited',this)">LIMITED DROPS</button>`;
+}
+
+// ── LOAD LOOKBOOK FROM SUPABASE ───────────────────────
+async function fetchLookbook() {
+  const row1El = document.getElementById('lookbook-row1');
+  const row2El = document.getElementById('lookbook-row2');
+  if (!row1El || !row2El) return;
+  let items = DEFAULT_LOOKBOOK;
+  try {
+    const { data } = await sb.from('lookbook').select('*').order('sort_order', { ascending: true });
+    if (data && data.length) items = data;
+  } catch(e) {}
+  function makeItem(item) {
+    return `<div class="lookbook-item"><img src="${sanitize(item.url)}" alt="${sanitize(item.alt||'')}" loading="lazy"/><div class="lookbook-item-label">${sanitize(item.label||'')}</div></div>`;
+  }
+  const fwd = items.map(makeItem).join('');
+  const rev = [...items].reverse().map(makeItem).join('');
+  row1El.innerHTML = fwd + fwd;
+  row2El.innerHTML = rev + rev;
+  initLookbookRow(
+    document.getElementById('row1-outer'),
+    row1El, 1.6, 1
+  );
+  initLookbookRow(
+    document.getElementById('row2-outer'),
+    row2El, 1.2, -1
+  );
+}
 
 // ── FETCH PRODUCTS FROM SUPABASE ──────────────────────
 async function fetchProducts() {
@@ -813,13 +862,11 @@ async function fetchProducts() {
 // ── FILTER & SEARCH ───────────────────────────────────
 function getFiltered(){
   const q=searchQuery.toLowerCase().trim();
-  const categoryFilters=['tee','hoodie','headwear','polo','sweatshirt','armless'];
   return products.filter(p=>{
     let mf;
     if(activeFilter==='all') mf=true;
     else if(activeFilter==='limited') mf=p.type==='limited';
-    else if(categoryFilters.includes(activeFilter)) mf=p.category===activeFilter;
-    else mf=true;
+    else mf=p.category===activeFilter;
     const ms=!q||p.name.toLowerCase().includes(q)||p.material.toLowerCase().includes(q)||(p.category&&p.category.toLowerCase().includes(q));
     return mf&&ms;
   });
@@ -1214,17 +1261,10 @@ async function init() {
   }
 
   fetchProducts();
+  loadCategories();
+  fetchLookbook();
   updateCartUI();
   observeFadeIns();
-
-  initLookbookRow(
-    document.getElementById('row1-outer'),
-    document.getElementById('lookbook-row1'), 1.6, 1
-  );
-  initLookbookRow(
-    document.getElementById('row2-outer'),
-    document.getElementById('lookbook-row2'), 1.2, -1
-  );
 }
 
 document.addEventListener('DOMContentLoaded', init);

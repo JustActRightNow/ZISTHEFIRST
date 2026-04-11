@@ -156,6 +156,21 @@ tr:hover td{background:#080808;}
 
 /* ── ORDER ITEMS CELL ── */
 .oi{font-size:10px;color:var(--grey-text);line-height:1.8;}
+
+/* ── CATEGORY CARD ── */
+.catcard{background:var(--grey);border:1px solid #1a1a1a;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.catcard-info{flex:1;}
+.catcard-label{font-family:var(--font-d);font-size:16px;letter-spacing:0.05em;}
+.catcard-slug{font-size:9px;color:var(--grey-text);letter-spacing:0.18em;text-transform:uppercase;margin-top:3px;}
+
+/* ── LOOKBOOK CARD ── */
+.lbcard{background:var(--grey);border:1px solid #1a1a1a;overflow:hidden;}
+.lbcard-img{aspect-ratio:1/1;background:#0a0a0a;overflow:hidden;}
+.lbcard-img img{width:100%;height:100%;object-fit:cover;}
+.lbcard-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:13px;color:#1a1a1a;}
+.lbcard-body{padding:13px;}
+.lbcard-label{font-family:var(--font-d);font-size:14px;letter-spacing:0.05em;margin-bottom:8px;line-height:1.2;}
+.lbcard-actions{display:flex;gap:5px;}
 </style>
 </head>
 <body>
@@ -195,6 +210,8 @@ tr:hover td{background:#080808;}
     <button class="tab on" onclick="switchTab('products',this)">PRODUCTS</button>
     <button class="tab" onclick="switchTab('orders',this)">ORDERS</button>
     <button class="tab" onclick="switchTab('signups',this)">EMAIL SIGNUPS</button>
+    <button class="tab" onclick="switchTab('categories',this)">CATEGORIES</button>
+    <button class="tab" onclick="switchTab('lookbook',this)">LOOKBOOK</button>
   </div>
 
   <!-- PRODUCTS PANE -->
@@ -242,6 +259,62 @@ tr:hover td{background:#080808;}
     </div>
     <div class="empty" id="signups-empty" style="display:none;"><div class="empty-icon">◻</div><div class="empty-txt">No signups yet</div></div>
   </div>
+
+  <!-- CATEGORIES PANE -->
+  <div class="tab-pane" id="tp-categories">
+    <div class="sbar">
+      <div class="stitle">CATEGORIES</div>
+      <button class="btn-add" onclick="openCatModal()">+ ADD CATEGORY</button>
+    </div>
+    <div id="cat-list" class="pgrid"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+  </div>
+
+  <!-- LOOKBOOK PANE -->
+  <div class="tab-pane" id="tp-lookbook">
+    <div class="sbar">
+      <div class="stitle">LOOKBOOK</div>
+      <button class="btn-add" onclick="openLbModal()">+ ADD IMAGE</button>
+    </div>
+    <div id="lb-grid" class="pgrid"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+  </div>
+</div>
+
+<!-- ══ CATEGORY MODAL ══════════════════════════════════ -->
+<div class="moverlay" id="cat-modal">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mtitle">ADD CATEGORY</span>
+      <button class="mclose" onclick="closeCatModal()">×</button>
+    </div>
+    <div class="mbody">
+      <div class="field"><label>Label (display name) *</label><input type="text" id="cat-label" placeholder="e.g. JERSEYS" maxlength="60"/></div>
+      <div class="field"><label>Slug (filter key) *</label><input type="text" id="cat-slug" placeholder="e.g. jersey" maxlength="40"/></div>
+      <div class="field"><label>Sort Order</label><input type="number" id="cat-sort" placeholder="0" min="0" value="0"/></div>
+      <button class="btn-red" onclick="saveCat()">SAVE CATEGORY</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOOKBOOK MODAL ═════════════════════════════════ -->
+<div class="moverlay" id="lb-modal">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mtitle">ADD LOOKBOOK IMAGE</span>
+      <button class="mclose" onclick="closeLbModal()">×</button>
+    </div>
+    <div class="mbody">
+      <div class="field">
+        <label>Image *</label>
+        <button type="button" class="upload-btn" onclick="uploadLbImg()">↑ UPLOAD IMAGE</button>
+        <img id="lb-prev" class="upload-prev"/>
+        <input type="hidden" id="lb-url"/>
+      </div>
+      <div class="field"><label>Label</label><input type="text" id="lb-label" placeholder="e.g. ZTF ALTERNATE WHITE TEE" maxlength="120"/></div>
+      <div class="field"><label>Alt Text</label><input type="text" id="lb-alt" placeholder="e.g. ZTF White Tee" maxlength="120"/></div>
+      <div class="field"><label>Sort Order</label><input type="number" id="lb-sort" placeholder="0" min="0" value="0"/></div>
+      <button class="btn-red" onclick="saveLbImage()">SAVE IMAGE</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ PRODUCT MODAL ══════════════════════════════════ -->
@@ -267,6 +340,8 @@ tr:hover td{background:#080808;}
             <option value="polo">Polo</option>
             <option value="sweatshirt">Sweatshirt</option>
             <option value="armless">Armless</option>
+            <option value="jersey">Jersey</option>
+            <option value="pants">Pants</option>
           </select>
         </div>
         <div class="field">
@@ -324,6 +399,29 @@ tr:hover td{background:#080808;}
 <script>
 'use strict';
 
+/*
+ * SUPABASE TABLES REQUIRED FOR CATEGORIES & LOOKBOOK:
+ *
+ * CREATE TABLE categories (
+ *   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ *   slug text UNIQUE NOT NULL,
+ *   label text NOT NULL,
+ *   sort_order int DEFAULT 0,
+ *   created_at timestamptz DEFAULT now()
+ * );
+ *
+ * CREATE TABLE lookbook (
+ *   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ *   url text NOT NULL,
+ *   label text,
+ *   alt text,
+ *   sort_order int DEFAULT 0,
+ *   created_at timestamptz DEFAULT now()
+ * );
+ *
+ * Enable RLS and add appropriate policies for authenticated admin users.
+ */
+
 const { createClient } = supabase;
 let sb = null;
 const CLD_NAME   = 'dadjmvc82';
@@ -374,6 +472,10 @@ function boot() {
     if (user) document.getElementById('dh-email').textContent = user.email;
   });
   loadStats(); loadProducts();
+  // Populate category dropdown from Supabase (falls back silently)
+  sb.from('categories').select('*').order('sort_order', { ascending: true }).then(({ data }) => {
+    if (data && data.length) populateCatDropdown(data);
+  });
 }
 
 // ── TABS ─────────────────────────────────────────────
@@ -382,8 +484,10 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('on'));
   btn.classList.add('on');
   document.getElementById('tp-' + name).classList.add('on');
-  if (name === 'orders')  loadOrders();
-  if (name === 'signups') loadSignups();
+  if (name === 'orders')     loadOrders();
+  if (name === 'signups')    loadSignups();
+  if (name === 'categories') loadCategories();
+  if (name === 'lookbook')   loadLookbook();
 }
 
 // ── STATS ─────────────────────────────────────────────
@@ -668,6 +772,171 @@ function exportSignups() {
   });
 }
 
+// ── CATEGORIES ────────────────────────────────────────
+const DEFAULT_ADMIN_CATEGORIES = [
+  {slug:'tee',label:'TEES',sort_order:0},
+  {slug:'hoodie',label:'HOODIES',sort_order:1},
+  {slug:'headwear',label:'HEADWEAR',sort_order:2},
+  {slug:'polo',label:'POLOS',sort_order:3},
+  {slug:'sweatshirt',label:'SWEATSHIRTS',sort_order:4},
+  {slug:'armless',label:'ARMLESS',sort_order:5},
+  {slug:'jersey',label:'JERSEYS',sort_order:6},
+  {slug:'pants',label:'PANTS',sort_order:7}
+];
+
+async function loadCategories() {
+  const el = document.getElementById('cat-list');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading categories...</div>';
+  const { data, error } = await sb.from('categories').select('*').order('sort_order', { ascending: true });
+  if (error) { toast('Error loading categories', false); el.innerHTML = ''; return; }
+  const cats = (data && data.length) ? data : [];
+  if (!cats.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">No categories yet. Add one above.</div></div>';
+    populateCatDropdown([]);
+    return;
+  }
+  el.innerHTML = cats.map(c => `
+    <div class="catcard">
+      <div class="catcard-info">
+        <div class="catcard-label">${esc(c.label)}</div>
+        <div class="catcard-slug">slug: ${esc(c.slug)}</div>
+      </div>
+      <button class="btn-xs d" onclick="delCategory('${esc(c.id)}','${esc(c.label)}')">DELETE</button>
+    </div>`).join('');
+  populateCatDropdown(cats);
+}
+
+function populateCatDropdown(cats) {
+  const sel = document.getElementById('p-cat');
+  if (!sel) return;
+  const list = cats.length ? cats : DEFAULT_ADMIN_CATEGORIES;
+  const current = sel.value;
+  sel.innerHTML = list.map(c => `<option value="${esc(c.slug)}">${esc(c.label.charAt(0).toUpperCase()+c.label.slice(1).toLowerCase())}</option>`).join('');
+  if (current) sel.value = current;
+}
+
+function openCatModal() {
+  document.getElementById('cat-label').value = '';
+  document.getElementById('cat-slug').value = '';
+  document.getElementById('cat-sort').value = '0';
+  document.getElementById('cat-modal').classList.add('on');
+}
+function closeCatModal() { document.getElementById('cat-modal').classList.remove('on'); }
+
+// Auto-generate slug from label
+(function() {
+  const labelEl = document.getElementById('cat-label');
+  const slugEl  = document.getElementById('cat-slug');
+  if (labelEl && slugEl) {
+    labelEl.addEventListener('input', () => {
+      slugEl.value = labelEl.value.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    });
+  }
+})();
+
+async function saveCat() {
+  const label = document.getElementById('cat-label').value.trim().toUpperCase();
+  const slug  = document.getElementById('cat-slug').value.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  const sort  = parseInt(document.getElementById('cat-sort').value) || 0;
+  if (!label) { toast('Label is required', false); return; }
+  if (!slug)  { toast('Slug is required', false); return; }
+  const { error } = await sb.from('categories').insert([{ label, slug, sort_order: sort }]);
+  if (error) { toast('Save failed: ' + error.message, false); return; }
+  toast('Category added ✓', true);
+  closeCatModal();
+  loadCategories();
+}
+
+async function delCategory(id, label) {
+  if (!confirm(`Delete category "${label}"? Products in this category will not be deleted.`)) return;
+  const { error } = await sb.from('categories').delete().eq('id', id);
+  if (error) { toast('Delete failed', false); return; }
+  toast('Category deleted', true);
+  loadCategories();
+}
+
+// ── LOOKBOOK ──────────────────────────────────────────
+async function loadLookbook() {
+  const el = document.getElementById('lb-grid');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading lookbook...</div>';
+  const { data, error } = await sb.from('lookbook').select('*').order('sort_order', { ascending: true });
+  if (error) { toast('Error loading lookbook', false); el.innerHTML = ''; return; }
+  if (!data || !data.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">No lookbook images yet. Add one above.</div></div>';
+    return;
+  }
+  el.innerHTML = data.map(img => `
+    <div class="lbcard">
+      <div class="lbcard-img">${img.url
+        ? `<img src="${esc(img.url)}" alt="${esc(img.alt||'')}" loading="lazy"/>`
+        : `<div class="lbcard-img-ph">ZTF</div>`}
+      </div>
+      <div class="lbcard-body">
+        <div class="lbcard-label">${esc(img.label||'—')}</div>
+        <div class="lbcard-actions">
+          <button class="btn-xs d" onclick="delLbImage('${esc(img.id)}')">DELETE</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openLbModal() {
+  document.getElementById('lb-url').value = '';
+  document.getElementById('lb-label').value = '';
+  document.getElementById('lb-alt').value = '';
+  document.getElementById('lb-sort').value = '0';
+  document.getElementById('lb-prev').style.display = 'none';
+  document.getElementById('lb-modal').classList.add('on');
+}
+function closeLbModal() { document.getElementById('lb-modal').classList.remove('on'); }
+
+function uploadLbImg() {
+  if (typeof cloudinary === 'undefined') { toast('Cloudinary widget not loaded', false); return; }
+  cloudinary.createUploadWidget({
+    cloudName: CLD_NAME,
+    uploadPreset: CLD_PRESET,
+    sources: ['local','camera','url'],
+    multiple: false,
+    folder: 'ztf_lookbook',
+    clientAllowedFormats: ['jpg','jpeg','png','webp'],
+    maxFileSize: 8000000,
+    showPoweredBy: false,
+    styles: { palette: { window:'#111111', sourceBg:'#000000', windowBorder:'#333333',
+      tabIcon:'#cc0000', inactiveTabIcon:'#666666', menuIcons:'#ffffff',
+      link:'#cc0000', action:'#cc0000', inProgress:'#cc0000',
+      complete:'#00aa44', error:'#cc0000', textDark:'#000000', textLight:'#ffffff' } }
+  }, (err, result) => {
+    if (!err && result && result.event === 'success') {
+      const url = result.info.secure_url;
+      document.getElementById('lb-url').value = url;
+      const prev = document.getElementById('lb-prev');
+      prev.src = url; prev.style.display = 'block';
+      toast('Image uploaded ✓', true);
+    }
+  }).open();
+}
+
+async function saveLbImage() {
+  const url   = document.getElementById('lb-url').value.trim();
+  const label = document.getElementById('lb-label').value.trim();
+  const alt   = document.getElementById('lb-alt').value.trim();
+  const sort  = parseInt(document.getElementById('lb-sort').value) || 0;
+  if (!url) { toast('Please upload an image first', false); return; }
+  const { error } = await sb.from('lookbook').insert([{ url, label, alt, sort_order: sort }]);
+  if (error) { toast('Save failed: ' + error.message, false); return; }
+  toast('Lookbook image added ✓', true);
+  closeLbModal();
+  loadLookbook();
+}
+
+async function delLbImage(id) {
+  if (!confirm('Delete this lookbook image?')) return;
+  const { error } = await sb.from('lookbook').delete().eq('id', id);
+  if (error) { toast('Delete failed', false); return; }
+  toast('Image deleted', true);
+  loadLookbook();
+}
+
 // ── UTILITIES ─────────────────────────────────────────
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -687,7 +956,9 @@ function toast(msg, ok = false) {
 
 // ── KEYBOARD ──────────────────────────────────────────
 document.getElementById('l-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeCatModal(); closeLbModal(); }
+});
 
 loadConfigAndBoot();
 </script>

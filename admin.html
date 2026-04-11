@@ -158,7 +158,8 @@ tr:hover td{background:#080808;}
 .oi{font-size:10px;color:var(--grey-text);line-height:1.8;}
 
 /* ── CATEGORY CARD ── */
-.catcard{background:var(--grey);border:1px solid #1a1a1a;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.catcard{background:var(--grey);border:1px solid #1a1a1a;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;}
+.catcard:hover{border-color:#333;}
 .catcard-info{flex:1;}
 .catcard-label{font-family:var(--font-d);font-size:16px;letter-spacing:0.05em;}
 .catcard-slug{font-size:9px;color:var(--grey-text);letter-spacing:0.18em;text-transform:uppercase;margin-top:3px;}
@@ -465,12 +466,14 @@ async function checkSession() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) boot();
 }
-function boot() {
+async function boot() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
   sb.auth.getUser().then(({ data: { user } }) => {
     if (user) document.getElementById('dh-email').textContent = user.email;
   });
+  // Seed built-in defaults into Supabase so they are manageable (show/delete)
+  await Promise.all([seedDefaultCategories(), seedDefaultLookbook()]);
   loadStats(); loadProducts();
   // Populate category dropdown from Supabase (falls back silently)
   sb.from('categories').select('*').order('sort_order', { ascending: true }).then(({ data }) => {
@@ -784,24 +787,39 @@ const DEFAULT_ADMIN_CATEGORIES = [
   {slug:'pants',label:'PANTS',sort_order:7}
 ];
 
+// ── DEFAULT LOOKBOOK ──────────────────────────────────
+const DEFAULT_LOOKBOOK = [
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png',label:'ZTF ALTERNATE WHITE TEE',alt:'ZTF White Tee'},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png',label:'TRIAL OF EREN YAEGER',alt:'ZTF Eren'},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png',label:'ZTF XANDER',alt:'ZTF Xander'},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png',label:'ZTF ALTERNATE BLACK HOODIE',alt:'ZTF Hoodie'},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png',label:'ZTF NEON SNAPBACK',alt:'ZTF Snapback'}
+];
+
 async function loadCategories() {
   const el = document.getElementById('cat-list');
   el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading categories...</div>';
   const { data, error } = await sb.from('categories').select('*').order('sort_order', { ascending: true });
   if (error) { toast('Error loading categories', false); el.innerHTML = ''; return; }
-  const cats = (data && data.length) ? data : [];
+  // Merge: always show defaults + any Supabase entries (dedupe by slug, Supabase wins)
+  const sbSlugs = new Set((data || []).map(c => c.slug));
+  const fallbacks = DEFAULT_ADMIN_CATEGORIES.filter(c => !sbSlugs.has(c.slug));
+  const cats = [
+    ...(data || []),
+    ...fallbacks
+  ].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   if (!cats.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">No categories yet. Add one above.</div></div>';
     populateCatDropdown([]);
     return;
   }
   el.innerHTML = cats.map(c => `
-    <div class="catcard">
+    <div class="catcard" onclick="viewCatProducts('${esc(c.slug)}')">
       <div class="catcard-info">
         <div class="catcard-label">${esc(c.label)}</div>
         <div class="catcard-slug">slug: ${esc(c.slug)}</div>
       </div>
-      <button class="btn-xs d" onclick="delCategory('${esc(c.id)}','${esc(c.label)}')">DELETE</button>
+      ${c.id ? `<button class="btn-xs d" onclick="event.stopPropagation();delCategory('${esc(c.id)}','${esc(c.label)}')">DELETE</button>` : ''}
     </div>`).join('');
   populateCatDropdown(cats);
 }
@@ -855,17 +873,54 @@ async function delCategory(id, label) {
   loadCategories();
 }
 
+// Seed default categories into Supabase on first login (upsert = skip if slug exists)
+async function seedDefaultCategories() {
+  try {
+    await sb.from('categories').upsert(
+      DEFAULT_ADMIN_CATEGORIES.map(c => ({ label: c.label, slug: c.slug, sort_order: c.sort_order })),
+      { onConflict: 'slug', ignoreDuplicates: true }
+    );
+  } catch(e) { console.warn('Category seed failed', e); }
+}
+
+// Seed default lookbook images once (tracked via localStorage so deleted items stay deleted)
+async function seedDefaultLookbook() {
+  const KEY = 'ztf_lb_seeded';
+  if (localStorage.getItem(KEY)) return;
+  try {
+    const { data } = await sb.from('lookbook').select('url');
+    const existingUrls = new Set((data || []).map(i => i.url));
+    const toInsert = DEFAULT_LOOKBOOK
+      .filter(i => !existingUrls.has(i.url))
+      .map((item, idx) => ({ url: item.url, label: item.label, alt: item.alt, sort_order: idx }));
+    if (toInsert.length) await sb.from('lookbook').insert(toInsert);
+    localStorage.setItem(KEY, '1');
+  } catch(e) { console.warn('Lookbook seed failed', e); }
+}
+
+// Switch to Products tab and filter by category slug
+function viewCatProducts(slug) {
+  const tab = document.querySelector('.tab[onclick*="\'products\'"]');
+  if (tab) switchTab('products', tab);
+  const si = document.querySelector('.search-inp');
+  if (si) { si.value = slug; filterProducts(slug); }
+}
+
 // ── LOOKBOOK ──────────────────────────────────────────
 async function loadLookbook() {
   const el = document.getElementById('lb-grid');
   el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading lookbook...</div>';
   const { data, error } = await sb.from('lookbook').select('*').order('sort_order', { ascending: true });
   if (error) { toast('Error loading lookbook', false); el.innerHTML = ''; return; }
-  if (!data || !data.length) {
+  // Merge: always show defaults + Supabase entries (dedupe by URL, Supabase wins)
+  const sbUrls = new Set((data || []).map(i => i.url));
+  const fallbacks = DEFAULT_LOOKBOOK.filter(i => !sbUrls.has(i.url));
+  const items = [...(data || []), ...fallbacks];
+  if (!items.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">No lookbook images yet. Add one above.</div></div>';
     return;
   }
-  el.innerHTML = data.map(img => `
+  el.innerHTML = items.map(img => `
     <div class="lbcard">
       <div class="lbcard-img">${img.url
         ? `<img src="${esc(img.url)}" alt="${esc(img.alt||'')}" loading="lazy"/>`
@@ -874,7 +929,7 @@ async function loadLookbook() {
       <div class="lbcard-body">
         <div class="lbcard-label">${esc(img.label||'—')}</div>
         <div class="lbcard-actions">
-          <button class="btn-xs d" onclick="delLbImage('${esc(img.id)}')">DELETE</button>
+          ${img.id ? `<button class="btn-xs d" onclick="delLbImage('${esc(img.id)}')">DELETE</button>` : ''}
         </div>
       </div>
     </div>`).join('');

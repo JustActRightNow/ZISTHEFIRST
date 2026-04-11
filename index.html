@@ -783,10 +783,17 @@ function formatPrice(n){return Number(n).toLocaleString('en-NG');}
 
 // ── LOAD CATEGORIES FROM SUPABASE ────────────────────
 async function loadCategories() {
-  let cats = DEFAULT_CATEGORIES;
+  let cats = [...DEFAULT_CATEGORIES];
   try {
     const { data } = await sb.from('categories').select('*').order('sort_order', { ascending: true });
-    if (data && data.length) cats = data;
+    if (data && data.length) {
+      // Merge: show defaults not already in Supabase + all Supabase entries, sorted
+      const sbSlugs = new Set(data.map(c => c.slug));
+      cats = [
+        ...DEFAULT_CATEGORIES.filter(c => !sbSlugs.has(c.slug)),
+        ...data
+      ].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    }
   } catch(e) {}
   const filterRow = document.getElementById('filter-row');
   if (!filterRow) return;
@@ -804,10 +811,17 @@ async function fetchLookbook() {
   const row1El = document.getElementById('lookbook-row1');
   const row2El = document.getElementById('lookbook-row2');
   if (!row1El || !row2El) return;
-  let items = DEFAULT_LOOKBOOK;
+  let items = [...DEFAULT_LOOKBOOK];
   try {
     const { data } = await sb.from('lookbook').select('*').order('sort_order', { ascending: true });
-    if (data && data.length) items = data;
+    if (data && data.length) {
+      // Merge: show defaults not already in Supabase + all Supabase entries
+      const sbUrls = new Set(data.map(i => i.url));
+      items = [
+        ...DEFAULT_LOOKBOOK.filter(i => !sbUrls.has(i.url)),
+        ...data
+      ];
+    }
   } catch(e) {}
   function makeItem(item) {
     return `<div class="lookbook-item"><img src="${sanitize(item.url)}" alt="${sanitize(item.alt||'')}" loading="lazy"/><div class="lookbook-item-label">${sanitize(item.label||'')}</div></div>`;

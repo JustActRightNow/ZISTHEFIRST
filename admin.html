@@ -351,6 +351,13 @@ tr:hover td{background:#080808;}
       </div>
       <div class="field"><label>Label</label><input type="text" id="lb-label" placeholder="e.g. ZTF ALTERNATE WHITE TEE" maxlength="120"/></div>
       <div class="field"><label>Alt Text</label><input type="text" id="lb-alt" placeholder="e.g. ZTF White Tee" maxlength="120"/></div>
+      <div class="field">
+        <label>Lookbook Line *</label>
+        <select id="lb-line">
+          <option value="1">Line 1 (top row)</option>
+          <option value="2">Line 2 (bottom row)</option>
+        </select>
+      </div>
       <div class="field"><label>Sort Order</label><input type="number" id="lb-sort" placeholder="0" min="0" value="0"/></div>
       <button class="btn-red" onclick="saveLbImage()">SAVE IMAGE</button>
     </div>
@@ -480,8 +487,11 @@ tr:hover td{background:#080808;}
  *   label text,
  *   alt text,
  *   sort_order int DEFAULT 0,
+ *   line int DEFAULT 1,
  *   created_at timestamptz DEFAULT now()
  * );
+ * -- If the table already exists, add the line column:
+ * -- ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS line int DEFAULT 1;
  *
  * SUPABASE TABLES REQUIRED FOR WHAT'S DROPPING:
  *
@@ -872,11 +882,11 @@ const DEFAULT_ADMIN_CATEGORIES = [
 
 // ── DEFAULT LOOKBOOK ──────────────────────────────────
 const DEFAULT_LOOKBOOK = [
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png',label:'ZTF ALTERNATE WHITE TEE',alt:'ZTF White Tee'},
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png',label:'TRIAL OF EREN YAEGER',alt:'ZTF Eren'},
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png',label:'ZTF XANDER',alt:'ZTF Xander'},
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png',label:'ZTF ALTERNATE BLACK HOODIE',alt:'ZTF Hoodie'},
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png',label:'ZTF NEON SNAPBACK',alt:'ZTF Snapback'}
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png',label:'ZTF ALTERNATE WHITE TEE',alt:'ZTF White Tee',line:1},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png',label:'TRIAL OF EREN YAEGER',alt:'ZTF Eren',line:1},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png',label:'ZTF XANDER',alt:'ZTF Xander',line:1},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png',label:'ZTF ALTERNATE BLACK HOODIE',alt:'ZTF Hoodie',line:2},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png',label:'ZTF NEON SNAPBACK',alt:'ZTF Snapback',line:2}
 ];
 
 async function loadCategories() {
@@ -977,14 +987,16 @@ async function seedDefaultCategories() {
 
 // Seed default lookbook images once (tracked via localStorage so deleted items stay deleted)
 async function seedDefaultLookbook() {
-  const KEY = 'ztf_lb_seeded';
+  const KEY = 'ztf_lb_seeded_v2';
   if (localStorage.getItem(KEY)) return;
+  // Clear the old key to avoid stale state
+  localStorage.removeItem('ztf_lb_seeded');
   try {
     const { data } = await sb.from('lookbook').select('url');
     const existingUrls = new Set((data || []).map(i => i.url));
     const toInsert = DEFAULT_LOOKBOOK
       .filter(i => !existingUrls.has(i.url))
-      .map((item, idx) => ({ url: item.url, label: item.label, alt: item.alt, sort_order: idx }));
+      .map((item, idx) => ({ url: item.url, label: item.label, alt: item.alt, sort_order: idx, line: item.line || 1 }));
     if (toInsert.length) await sb.from('lookbook').insert(toInsert);
     localStorage.setItem(KEY, '1');
   } catch(e) { console.warn('Lookbook seed failed', e); }
@@ -1004,10 +1016,7 @@ async function loadLookbook() {
   el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading lookbook...</div>';
   const { data, error } = await sb.from('lookbook').select('*').order('sort_order', { ascending: true });
   if (error) { toast('Error loading lookbook', false); el.innerHTML = ''; return; }
-  // Merge: always show defaults + Supabase entries (dedupe by URL, Supabase wins)
-  const sbUrls = new Set((data || []).map(i => i.url));
-  const fallbacks = DEFAULT_LOOKBOOK.filter(i => !sbUrls.has(i.url));
-  const items = [...(data || []), ...fallbacks];
+  const items = data || [];
   if (!items.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">No lookbook images yet. Add one above.</div></div>';
     return;
@@ -1020,6 +1029,7 @@ async function loadLookbook() {
       </div>
       <div class="lbcard-body">
         <div class="lbcard-label">${esc(img.label||'—')}</div>
+        <div class="lbcard-meta" style="font-size:9px;color:var(--grey-text);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">LINE ${esc(String(img.line||1))}</div>
         <div class="lbcard-actions">
           ${img.id ? `<button class="btn-xs d" onclick="delLbImage('${esc(img.id)}')">DELETE</button>` : ''}
         </div>
@@ -1031,6 +1041,7 @@ function openLbModal() {
   document.getElementById('lb-url').value = '';
   document.getElementById('lb-label').value = '';
   document.getElementById('lb-alt').value = '';
+  document.getElementById('lb-line').value = '1';
   document.getElementById('lb-sort').value = '0';
   document.getElementById('lb-prev').style.display = 'none';
   document.getElementById('lb-modal').classList.add('on');
@@ -1067,9 +1078,10 @@ async function saveLbImage() {
   const url   = document.getElementById('lb-url').value.trim();
   const label = document.getElementById('lb-label').value.trim();
   const alt   = document.getElementById('lb-alt').value.trim();
+  const line  = parseInt(document.getElementById('lb-line').value) || 1;
   const sort  = parseInt(document.getElementById('lb-sort').value) || 0;
   if (!url) { toast('Please upload an image first', false); return; }
-  const { error } = await sb.from('lookbook').insert([{ url, label, alt, sort_order: sort }]);
+  const { error } = await sb.from('lookbook').insert([{ url, label, alt, sort_order: sort, line }]);
   if (error) { toast('Save failed: ' + error.message, false); return; }
   toast('Lookbook image added ✓', true);
   closeLbModal();

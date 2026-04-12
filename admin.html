@@ -173,6 +173,26 @@ tr:hover td{background:#080808;}
 .lbcard-body{padding:13px;}
 .lbcard-label{font-family:var(--font-d);font-size:14px;letter-spacing:0.05em;margin-bottom:8px;line-height:1.2;}
 .lbcard-actions{display:flex;gap:5px;}
+
+/* ── DROP COLLECTION CARD ── */
+.dropcard{background:var(--grey);border:1px solid #1a1a1a;overflow:hidden;}
+.dropcard-img{aspect-ratio:3/4;background:#0a0a0a;overflow:hidden;position:relative;}
+.dropcard-img img{width:100%;height:100%;object-fit:cover;}
+.dropcard-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:13px;color:#1a1a1a;}
+.dropcard-date{position:absolute;top:8px;right:8px;background:var(--red);color:#fff;font-size:8px;letter-spacing:0.2em;padding:4px 8px;text-transform:uppercase;}
+.dropcard-body{padding:13px;}
+.dropcard-name{font-family:var(--font-d);font-size:16px;letter-spacing:0.05em;margin-bottom:4px;}
+.dropcard-desc{font-size:9px;color:var(--grey-text);letter-spacing:0.08em;line-height:1.6;margin-bottom:10px;}
+.dropcard-actions{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+/* ── DROP PRODUCTS PANEL ── */
+.drop-prods-panel{border-top:1px solid #1a1a1a;padding-top:10px;margin-top:4px;}
+.drop-prods-title{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--grey-text);margin-bottom:8px;}
+.drop-prod-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;padding:6px;background:#0a0a0a;border:1px solid #1a1a1a;}
+.drop-prod-img{width:36px;height:36px;object-fit:cover;background:#111;border:1px solid #222;flex-shrink:0;}
+.drop-prod-name{flex:1;font-size:10px;letter-spacing:0.05em;}
+.drop-prod-add{display:flex;gap:6px;align-items:center;margin-top:8px;}
+.drop-prod-select{flex:1;background:var(--black);border:1px solid #333;color:var(--white);font-family:var(--font-b);font-size:10px;padding:6px 10px;outline:none;}
+.drop-prod-select:focus{border-color:var(--red);}
 </style>
 </head>
 <body>
@@ -214,6 +234,7 @@ tr:hover td{background:#080808;}
     <button class="tab" onclick="switchTab('signups',this)">EMAIL SIGNUPS</button>
     <button class="tab" onclick="switchTab('categories',this)">CATEGORIES</button>
     <button class="tab" onclick="switchTab('lookbook',this)">LOOKBOOK</button>
+    <button class="tab" onclick="switchTab('drops',this)">WHAT'S DROPPING</button>
   </div>
 
   <!-- PRODUCTS PANE -->
@@ -279,6 +300,15 @@ tr:hover td{background:#080808;}
     </div>
     <div id="lb-grid" class="pgrid"><div class="loading"><div class="spinner"></div>Loading...</div></div>
   </div>
+
+  <!-- WHAT'S DROPPING PANE -->
+  <div class="tab-pane" id="tp-drops">
+    <div class="sbar">
+      <div class="stitle">WHAT'S DROPPING</div>
+      <button class="btn-add" onclick="openDropModal()">+ ADD COLLECTION</button>
+    </div>
+    <div id="drops-grid" class="pgrid"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+  </div>
 </div>
 
 <!-- ══ CATEGORY MODAL ══════════════════════════════════ -->
@@ -315,6 +345,30 @@ tr:hover td{background:#080808;}
       <div class="field"><label>Alt Text</label><input type="text" id="lb-alt" placeholder="e.g. ZTF White Tee" maxlength="120"/></div>
       <div class="field"><label>Sort Order</label><input type="number" id="lb-sort" placeholder="0" min="0" value="0"/></div>
       <button class="btn-red" onclick="saveLbImage()">SAVE IMAGE</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DROP COLLECTION MODAL ══════════════════════════ -->
+<div class="moverlay" id="drop-modal">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mtitle" id="drop-modal-title">ADD COLLECTION</span>
+      <button class="mclose" onclick="closeDropModal()">×</button>
+    </div>
+    <div class="mbody">
+      <input type="hidden" id="drop-edit-id"/>
+      <div class="field"><label>Collection Name *</label><input type="text" id="drop-name" placeholder="e.g. COLLECTION 002" maxlength="120"/></div>
+      <div class="field"><label>Drop Date *</label><input type="date" id="drop-date"/></div>
+      <div class="field"><label>Description</label><textarea id="drop-desc" placeholder="Short description of this collection..."></textarea></div>
+      <div class="field">
+        <label>Cover Image</label>
+        <button type="button" class="upload-btn" onclick="uploadDropImg()">↑ UPLOAD COVER IMAGE</button>
+        <img id="drop-img-prev" class="upload-prev"/>
+        <input type="hidden" id="drop-img-url"/>
+      </div>
+      <div class="field"><label>Sort Order</label><input type="number" id="drop-sort" placeholder="0" min="0" value="0"/></div>
+      <button class="btn-red" onclick="saveDropCollection()">SAVE COLLECTION</button>
     </div>
   </div>
 </div>
@@ -421,6 +475,25 @@ tr:hover td{background:#080808;}
  *   created_at timestamptz DEFAULT now()
  * );
  *
+ * SUPABASE TABLES REQUIRED FOR WHAT'S DROPPING:
+ *
+ * CREATE TABLE drops (
+ *   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ *   name text NOT NULL,
+ *   cover_image text,
+ *   drop_date date,
+ *   description text,
+ *   sort_order int DEFAULT 0,
+ *   created_at timestamptz DEFAULT now()
+ * );
+ *
+ * CREATE TABLE drop_products (
+ *   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ *   drop_id uuid REFERENCES drops(id) ON DELETE CASCADE,
+ *   product_id uuid REFERENCES products(id) ON DELETE CASCADE,
+ *   UNIQUE(drop_id, product_id)
+ * );
+ *
  * Enable RLS and add appropriate policies for authenticated admin users.
  */
 
@@ -492,6 +565,7 @@ function switchTab(name, btn) {
   if (name === 'signups')    loadSignups();
   if (name === 'categories') loadCategories();
   if (name === 'lookbook')   loadLookbook();
+  if (name === 'drops')      loadDrops();
 }
 
 // ── STATS ─────────────────────────────────────────────
@@ -1002,6 +1076,187 @@ async function delLbImage(id) {
   loadLookbook();
 }
 
+// ── WHAT'S DROPPING ──────────────────────────────────
+let dropEditId = null;
+
+function formatDropDate(dateStr) {
+  if (!dateStr) return 'SOON';
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length !== 3) return dateStr;
+  return new Date(parts[0], parts[1] - 1, parts[2])
+    .toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+async function loadDrops() {
+  const el = document.getElementById('drops-grid');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading drops...</div>';
+  const [{ data: drops, error }, { data: dropProds }, { data: prods }] = await Promise.all([
+    sb.from('drops').select('id,name,cover_image,drop_date,description,sort_order').order('sort_order', { ascending: true }),
+    sb.from('drop_products').select('*'),
+    sb.from('products').select('id,name,img_front,price')
+  ]);
+  if (error) { toast('Error loading drops', false); el.innerHTML = ''; return; }
+  if (!drops || !drops.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">No collections yet. Add one above.</div></div>';
+    return;
+  }
+  const prodMap = {};
+  (prods || []).forEach(p => { prodMap[p.id] = p; });
+  const dropProdMap = {};
+  (dropProds || []).forEach(dp => {
+    if (!dropProdMap[dp.drop_id]) dropProdMap[dp.drop_id] = [];
+    dropProdMap[dp.drop_id].push(dp);
+  });
+  el.innerHTML = drops.map(d => {
+    const dateStr = formatDropDate(d.drop_date);
+    const dps = dropProdMap[d.id] || [];
+    const prodsHtml = dps.map(dp => {
+      const p = prodMap[dp.product_id];
+      if (!p) return '';
+      return `<div class="drop-prod-row">
+        ${p.img_front ? `<img class="drop-prod-img" src="${esc(p.img_front)}" alt="${esc(p.name)}" loading="lazy"/>` : '<div class="drop-prod-img"></div>'}
+        <span class="drop-prod-name">${esc(p.name)}</span>
+        <button class="btn-xs d" onclick="removeProductFromDrop('${esc(dp.id)}')">REMOVE</button>
+      </div>`;
+    }).join('');
+    const addedIds = new Set(dps.map(dp => dp.product_id));
+    const availProds = (prods || []).filter(p => !addedIds.has(p.id));
+    const prodOpts = availProds.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+    return `
+    <div class="dropcard">
+      <div class="dropcard-img">
+        ${d.cover_image
+          ? `<img src="${esc(d.cover_image)}" alt="${esc(d.name)}" loading="lazy"/>`
+          : `<div class="dropcard-img-ph">ZTF</div>`}
+        <span class="dropcard-date">${esc(dateStr)}</span>
+      </div>
+      <div class="dropcard-body">
+        <div class="dropcard-name">${esc(d.name)}</div>
+        ${d.description ? `<div class="dropcard-desc">${esc(d.description)}</div>` : ''}
+        <div class="dropcard-actions">
+          <button class="btn-xs p" onclick="openDropModal('${esc(d.id)}')">EDIT</button>
+          <button class="btn-xs d" onclick="delDropCollection('${esc(d.id)}')">DELETE</button>
+        </div>
+        <div class="drop-prods-panel">
+          <div class="drop-prods-title">PRODUCTS IN THIS DROP (${dps.length})</div>
+          ${prodsHtml}
+          ${availProds.length
+            ? `<div class="drop-prod-add">
+                <select class="drop-prod-select" id="drop-prod-sel-${esc(d.id)}">
+                  <option value="">— select product —</option>
+                  ${prodOpts}
+                </select>
+                <button class="btn-xs p" onclick="addProductToDrop('${esc(d.id)}')">+ ADD</button>
+              </div>`
+            : `<div style="font-size:9px;color:var(--grey-text);margin-top:6px;letter-spacing:0.1em;">All products assigned</div>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openDropModal(id = null) {
+  dropEditId = id;
+  document.getElementById('drop-modal-title').textContent = id ? 'EDIT COLLECTION' : 'ADD COLLECTION';
+  document.getElementById('drop-edit-id').value = id || '';
+  document.getElementById('drop-name').value = '';
+  document.getElementById('drop-date').value = '';
+  document.getElementById('drop-desc').value = '';
+  document.getElementById('drop-img-url').value = '';
+  document.getElementById('drop-sort').value = '0';
+  document.getElementById('drop-img-prev').style.display = 'none';
+  if (id) {
+    sb.from('drops').select('*').eq('id', id).single().then(({ data }) => {
+      if (!data) return;
+      document.getElementById('drop-name').value = data.name || '';
+      document.getElementById('drop-date').value = data.drop_date || '';
+      document.getElementById('drop-desc').value = data.description || '';
+      document.getElementById('drop-img-url').value = data.cover_image || '';
+      document.getElementById('drop-sort').value = data.sort_order || 0;
+      if (data.cover_image) {
+        const prev = document.getElementById('drop-img-prev');
+        prev.src = data.cover_image; prev.style.display = 'block';
+      }
+    });
+  }
+  document.getElementById('drop-modal').classList.add('on');
+}
+function closeDropModal() { document.getElementById('drop-modal').classList.remove('on'); dropEditId = null; }
+
+function uploadDropImg() {
+  if (typeof cloudinary === 'undefined') { toast('Cloudinary widget not loaded', false); return; }
+  cloudinary.createUploadWidget({
+    cloudName: CLD_NAME,
+    uploadPreset: CLD_PRESET,
+    sources: ['local','camera','url'],
+    multiple: false,
+    folder: 'ztf_drops',
+    clientAllowedFormats: ['jpg','jpeg','png','webp'],
+    maxFileSize: 8000000,
+    showPoweredBy: false,
+    styles: { palette: { window:'#111111', sourceBg:'#000000', windowBorder:'#333333',
+      tabIcon:'#cc0000', inactiveTabIcon:'#666666', menuIcons:'#ffffff',
+      link:'#cc0000', action:'#cc0000', inProgress:'#cc0000',
+      complete:'#00aa44', error:'#cc0000', textDark:'#000000', textLight:'#ffffff' } }
+  }, (err, result) => {
+    if (!err && result && result.event === 'success') {
+      const url = result.info.secure_url;
+      document.getElementById('drop-img-url').value = url;
+      const prev = document.getElementById('drop-img-prev');
+      prev.src = url; prev.style.display = 'block';
+      toast('Image uploaded ✓', true);
+    }
+  }).open();
+}
+
+async function saveDropCollection() {
+  const name = document.getElementById('drop-name').value.trim();
+  const date = document.getElementById('drop-date').value;
+  const desc = document.getElementById('drop-desc').value.trim();
+  const img  = document.getElementById('drop-img-url').value.trim();
+  const sort = parseInt(document.getElementById('drop-sort').value) || 0;
+  if (!name) { toast('Collection name is required', false); return; }
+  if (!date) { toast('Drop date is required', false); return; }
+  const payload = { name, drop_date: date, description: desc, cover_image: img, sort_order: sort };
+  let error;
+  if (dropEditId) {
+    ({ error } = await sb.from('drops').update(payload).eq('id', dropEditId));
+  } else {
+    ({ error } = await sb.from('drops').insert([payload]));
+  }
+  if (error) { toast('Save failed: ' + error.message, false); return; }
+  toast(dropEditId ? 'Collection updated ✓' : 'Collection added ✓', true);
+  closeDropModal();
+  loadDrops();
+}
+
+async function delDropCollection(id) {
+  if (!confirm('Delete this drop collection? Products will not be deleted.')) return;
+  const { error } = await sb.from('drops').delete().eq('id', id);
+  if (error) { toast('Delete failed', false); return; }
+  toast('Collection deleted', true);
+  loadDrops();
+}
+
+async function addProductToDrop(dropId) {
+  const sel = document.getElementById('drop-prod-sel-' + dropId);
+  if (!sel) return;
+  const productId = sel.value;
+  if (!productId) { toast('Select a product first', false); return; }
+  const { error } = await sb.from('drop_products').insert([{ drop_id: dropId, product_id: productId }]);
+  if (error) { toast('Failed to add product: ' + error.message, false); return; }
+  toast('Product added to drop ✓', true);
+  loadDrops();
+}
+
+async function removeProductFromDrop(dropProdId) {
+  if (!confirm('Remove this product from the drop?')) return;
+  const { error } = await sb.from('drop_products').delete().eq('id', dropProdId);
+  if (error) { toast('Remove failed', false); return; }
+  toast('Product removed ✓', true);
+  loadDrops();
+}
+
 // ── UTILITIES ─────────────────────────────────────────
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1022,7 +1277,7 @@ function toast(msg, ok = false) {
 // ── KEYBOARD ──────────────────────────────────────────
 document.getElementById('l-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeModal(); closeCatModal(); closeLbModal(); }
+  if (e.key === 'Escape') { closeModal(); closeCatModal(); closeLbModal(); closeDropModal(); }
 });
 
 loadConfigAndBoot();

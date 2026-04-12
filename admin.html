@@ -193,6 +193,14 @@ tr:hover td{background:#080808;}
 .drop-prod-add{display:flex;gap:6px;align-items:center;margin-top:8px;}
 .drop-prod-select{flex:1;background:var(--black);border:1px solid #333;color:var(--white);font-family:var(--font-b);font-size:10px;padding:6px 10px;outline:none;}
 .drop-prod-select:focus{border-color:var(--red);}
+/* ── DB SETUP BANNER ── */
+.db-setup-banner{background:#1a0a00;border:1px solid #cc4400;padding:20px 24px;margin-bottom:16px;}
+.db-setup-title{font-family:var(--font-d);font-size:16px;letter-spacing:0.08em;color:#ff6600;margin-bottom:6px;}
+.db-setup-msg{font-size:10px;color:var(--grey-text);letter-spacing:0.08em;line-height:1.6;margin-bottom:14px;}
+.db-setup-msg code{background:#0a0a0a;border:1px solid #333;padding:2px 6px;font-size:10px;color:#ff6600;}
+.btn-setup{background:#cc4400;color:#fff;border:none;font-family:var(--font-b);font-size:11px;letter-spacing:0.2em;text-transform:uppercase;padding:12px 20px;transition:background .2s;cursor:pointer;}
+.btn-setup:hover{background:#ff5500;}
+.btn-setup:disabled{opacity:.5;cursor:not-allowed;}
 </style>
 </head>
 <body>
@@ -1095,7 +1103,25 @@ async function loadDrops() {
     sb.from('drop_products').select('*'),
     sb.from('products').select('id,name,img_front,price')
   ]);
-  if (error) { toast('Error loading drops', false); el.innerHTML = ''; return; }
+  if (error) {
+    const isMissing = error.code === '42P01' || (error.message && error.message.toLowerCase().includes('does not exist'));
+    if (isMissing) {
+      el.innerHTML = `
+        <div class="db-setup-banner">
+          <div class="db-setup-title">⚠ DATABASE TABLES MISSING</div>
+          <div class="db-setup-msg">
+            The <code>drops</code> and <code>drop_products</code> tables have not been created yet in your Supabase project.<br><br>
+            Click the button below to create them automatically. You must have the
+            <code>DATABASE_URL</code> environment variable set in Netlify (Supabase → Project Settings → Database → Connection string URI).
+          </div>
+          <button class="btn-setup" id="btn-run-setup" onclick="setupDropsTables()">▶ CREATE TABLES NOW</button>
+        </div>`;
+    } else {
+      toast('Error loading drops: ' + error.message, false);
+      el.innerHTML = '';
+    }
+    return;
+  }
   if (!drops || !drops.length) {
     el.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">No collections yet. Add one above.</div></div>';
     return;
@@ -1255,6 +1281,26 @@ async function removeProductFromDrop(dropProdId) {
   if (error) { toast('Remove failed', false); return; }
   toast('Product removed ✓', true);
   loadDrops();
+}
+
+async function setupDropsTables() {
+  const btn = document.getElementById('btn-run-setup');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ CREATING TABLES…'; }
+  try {
+    const res = await fetch('/.netlify/functions/setup-db', { method: 'POST' });
+    const json = await res.json();
+    if (res.ok && json.success) {
+      toast('Tables created successfully ✓', true);
+      loadDrops();
+    } else {
+      const msg = json.error || 'Setup failed';
+      toast('Setup error: ' + msg, false);
+      if (btn) { btn.disabled = false; btn.textContent = '▶ CREATE TABLES NOW'; }
+    }
+  } catch (err) {
+    toast('Setup request failed: ' + err.message, false);
+    if (btn) { btn.disabled = false; btn.textContent = '▶ CREATE TABLES NOW'; }
+  }
 }
 
 // ── UTILITIES ─────────────────────────────────────────

@@ -1,9 +1,11 @@
 // ═══════════════════════════════════════════════════
 // ZISTHEFIRST — Database Setup Endpoint
 // Netlify Function — POST /netlify/functions/setup-db
-// Creates the `drops` and `drop_products` tables in
-// Supabase if they do not already exist, then enables
-// RLS with sensible read-write policies.
+// Creates the `categories`, `lookbook`, `drops`, and
+// `drop_products` tables in Supabase if they do not
+// already exist, then enables RLS with sensible
+// read-write policies. Also ensures the `line` column
+// is present on the `lookbook` table.
 //
 // Two connection methods are supported (in priority order):
 //
@@ -28,6 +30,29 @@
 // ═══════════════════════════════════════════════════
 
 const SETUP_SQL = `
+-- categories table
+CREATE TABLE IF NOT EXISTS categories (
+  id         uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug       text        UNIQUE NOT NULL,
+  label      text        NOT NULL,
+  sort_order int         DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+-- lookbook table (with line column for two-row layout)
+CREATE TABLE IF NOT EXISTS lookbook (
+  id         uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  url        text        NOT NULL,
+  label      text,
+  alt        text,
+  sort_order int         DEFAULT 0,
+  line       int         DEFAULT 1,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Ensure the line column exists on existing lookbook tables
+ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS line int DEFAULT 1;
+
 -- drops table
 CREATE TABLE IF NOT EXISTS drops (
   id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -48,8 +73,44 @@ CREATE TABLE IF NOT EXISTS drop_products (
 );
 
 -- Enable row-level security
+ALTER TABLE categories    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE lookbook      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE drops         ENABLE ROW LEVEL SECURITY;
 ALTER TABLE drop_products ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can read categories (needed for the storefront)
+DO $$ BEGIN
+  CREATE POLICY "categories_public_select"
+    ON categories FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Authenticated users (admin) can insert / update / delete categories
+DO $$ BEGIN
+  CREATE POLICY "categories_auth_all"
+    ON categories FOR ALL
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Anyone can read lookbook (needed for the storefront)
+DO $$ BEGIN
+  CREATE POLICY "lookbook_public_select"
+    ON lookbook FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Authenticated users (admin) can insert / update / delete lookbook
+DO $$ BEGIN
+  CREATE POLICY "lookbook_auth_all"
+    ON lookbook FOR ALL
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Anyone can read drops (needed for the storefront)
 DO $$ BEGIN
@@ -178,7 +239,7 @@ async function runViaManagementApi(supabaseUrl, accessToken) {
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ success: true, message: 'drops and drop_products tables are ready.' })
+    body: JSON.stringify({ success: true, message: 'categories, lookbook, drops and drop_products tables are ready.' })
   };
 }
 
@@ -190,7 +251,7 @@ async function runViaDirectPostgres(dbUrl) {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ success: true, message: 'drops and drop_products tables are ready.' })
+      body: JSON.stringify({ success: true, message: 'categories, lookbook, drops and drop_products tables are ready.' })
     };
   } catch (err) {
     console.error('setup-db postgres error:', err.message);

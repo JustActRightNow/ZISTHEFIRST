@@ -735,11 +735,11 @@ const DEFAULT_CATEGORIES = [
 
 // ── DEFAULT LOOKBOOK (fallback if Supabase unavailable) ───────────────────
 const DEFAULT_LOOKBOOK = [
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png',alt:'ZTF White Tee',label:'ZTF ALTERNATE WHITE TEE'},
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png',alt:'ZTF Eren',label:'TRIAL OF EREN YAEGER'},
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png',alt:'ZTF Xander',label:'ZTF XANDER'},
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png',alt:'ZTF Hoodie',label:'ZTF ALTERNATE BLACK HOODIE'},
-  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png',alt:'ZTF Snapback',label:'ZTF NEON SNAPBACK'}
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774360134/ZTF_Alternate_White_T.png',alt:'ZTF White Tee',label:'ZTF ALTERNATE WHITE TEE',line:1},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359100/ZTF_BLK_T_THE_TRIAL_OF_EREN_YAEGER.png',alt:'ZTF Eren',label:'TRIAL OF EREN YAEGER',line:1},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774358348/ZTF_XANDER_WHITE.png',alt:'ZTF Xander',label:'ZTF XANDER',line:1},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359109/ZTF_ALT_HOODIE.png',alt:'ZTF Hoodie',label:'ZTF ALTERNATE BLACK HOODIE',line:2},
+  {url:'https://res.cloudinary.com/dadjmvc82/image/upload/v1774359110/ZTF_NEON_SNAPBACK.png',alt:'ZTF Snapback',label:'ZTF NEON SNAPBACK',line:2}
 ];
 
 // ── STATE ─────────────────────────────────────────────
@@ -780,23 +780,24 @@ async function fetchLookbook() {
   if (!row1El || !row2El) return;
   let items = [...DEFAULT_LOOKBOOK];
   try {
-    const { data } = await sb.from('lookbook').select('*').order('sort_order', { ascending: true });
-    if (data && data.length) {
-      // Merge: show defaults not already in Supabase + all Supabase entries
-      const sbUrls = new Set(data.map(i => i.url));
-      items = [
-        ...DEFAULT_LOOKBOOK.filter(i => !sbUrls.has(i.url)),
-        ...data
-      ];
+    const { data, error } = await sb.from('lookbook').select('*').order('sort_order', { ascending: true });
+    // If Supabase responded (even with empty array), use it as the sole source of truth
+    // so that items deleted by admin don't reappear here
+    if (!error) {
+      items = data || [];
     }
   } catch(e) {}
+  // Split items by line assignment; default to line 1 if unset
+  const line1 = items.filter(i => (i.line ?? 1) !== 2);
+  const line2 = items.filter(i => i.line === 2);
   function makeItem(item) {
     return `<div class="lookbook-item"><img src="${sanitize(item.url)}" alt="${sanitize(item.alt||'')}" loading="lazy"/><div class="lookbook-item-label">${sanitize(item.label||'')}</div></div>`;
   }
-  const fwd = items.map(makeItem).join('');
-  const rev = [...items].reverse().map(makeItem).join('');
-  row1El.innerHTML = fwd + fwd;
-  row2El.innerHTML = rev + rev;
+  const fwd1 = line1.map(makeItem).join('');
+  const fwd2 = line2.map(makeItem).join('');
+  // Duplicate content for seamless infinite scroll; fall back to other line if one is empty
+  row1El.innerHTML = fwd1 ? fwd1 + fwd1 : (fwd2 ? fwd2 + fwd2 : '');
+  row2El.innerHTML = fwd2 ? fwd2 + fwd2 : (fwd1 ? fwd1 + fwd1 : '');
   initLookbookRow(
     document.getElementById('row1-outer'),
     row1El, 1.6, 1

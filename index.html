@@ -60,10 +60,9 @@
     .hero-barcode{width:min(580px,92%);margin-bottom:24px;}
     .hero-barcode svg{width:100%;height:auto;}
     /* CSS text row under barcode — reliable on all devices */
-    .barcode-text-row{display:flex;width:100%;margin-top:6px;font-family:var(--font-body);font-size:clamp(10px,2.5vw,14px);font-weight:700;}
-    .barcode-text-white{flex:0 0 calc(298/600*100%);display:flex;justify-content:space-between;color:var(--white);}
-    .barcode-text-gap{flex:0 0 calc(5/600*100%);}
-    .barcode-text-red{flex:0 0 calc(295/600*100%);display:flex;justify-content:space-between;color:var(--red);}
+    .barcode-text-row{display:flex;width:100%;justify-content:space-between;margin-top:6px;font-family:var(--font-body);font-size:clamp(10px,2.5vw,14px);font-weight:700;}
+    .barcode-text-white{color:var(--white);}
+    .barcode-text-red{color:var(--red);}
 
     /* PRODUCT FLIP */
     .product-img-wrap{aspect-ratio:1/1;overflow:hidden;background:#0a0a0a;position:relative;perspective:800px;}
@@ -84,7 +83,8 @@
     .drops-eyebrow{font-size:9px;letter-spacing:0.3em;color:var(--red);text-transform:uppercase;margin-bottom:12px;}
     .drops-headline{font-family:var(--font-display);font-size:clamp(40px,8vw,80px);line-height:0.95;margin-bottom:8px;}
     .drops-sub{font-size:11px;color:var(--grey-text);letter-spacing:0.1em;margin-bottom:48px;max-width:480px;}
-    .drops-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2px;}
+    .drops-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;align-items:start;}
+    @media(max-width:600px){.drops-grid{grid-template-columns:1fr;}}
     .drop-card{background:var(--grey2);position:relative;overflow:hidden;border:1px solid #1a1a1a;}
     .drop-card-img{aspect-ratio:3/4;background:#0a0a0a;overflow:hidden;position:relative;}
     .drop-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.6s;}
@@ -390,9 +390,7 @@
     </svg>
     <!-- CSS text row below barcode — works on ALL devices unlike SVG textLength -->
     <div class="barcode-text-row">
-      <span class="barcode-text-white"><span>Z</span><span>I</span><span>S</span><span>T</span><span>H</span><span>E</span></span>
-      <span class="barcode-text-gap"></span>
-      <span class="barcode-text-red"><span>F</span><span>I</span><span>R</span><span>S</span><span>T</span></span>
+      <span class="barcode-text-white">Z</span><span class="barcode-text-white">I</span><span class="barcode-text-white">S</span><span class="barcode-text-white">T</span><span class="barcode-text-white">H</span><span class="barcode-text-white">E</span><span class="barcode-text-red">F</span><span class="barcode-text-red">I</span><span class="barcode-text-red">R</span><span class="barcode-text-red">S</span><span class="barcode-text-red">T</span>
     </div>
   </div>
   <p class="hero-eyebrow">ESTABLISHED 2024 — LAGOS, NIGERIA</p>
@@ -572,7 +570,7 @@
           </a>
           <a href="https://x.com/zisthefirst" target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            X / Twitter
+            Twitter
           </a>
         </div>
       </div>
@@ -596,7 +594,7 @@
     </div>
     <div class="footer-bottom">
       <p class="footer-copy">&copy; <span id="footer-year"></span> ZISTHEFIRST. All rights reserved.</p>
-      <p class="footer-est">ESTABLISHED <span>2026</span> — LAGOS, NG</p>
+      <p class="footer-est">ESTABLISHED <span>2024</span> — LAGOS, NG</p>
     </div>
   </div>
 </footer>

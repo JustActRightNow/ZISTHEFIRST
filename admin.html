@@ -163,6 +163,7 @@ tr:hover td{background:#080808;}
 .catcard-info{flex:1;}
 .catcard-label{font-family:var(--font-d);font-size:16px;letter-spacing:0.05em;}
 .catcard-slug{font-size:9px;color:var(--grey-text);letter-spacing:0.18em;text-transform:uppercase;margin-top:3px;}
+.catcard-count{display:inline-block;background:var(--red);color:#fff;font-size:8px;letter-spacing:0.18em;text-transform:uppercase;padding:2px 7px;margin-left:8px;vertical-align:middle;}
 
 /* ── LOOKBOOK CARD ── */
 .lbcard{background:var(--grey);border:1px solid #1a1a1a;overflow:hidden;}
@@ -799,8 +800,14 @@ const DEFAULT_LOOKBOOK = [
 async function loadCategories() {
   const el = document.getElementById('cat-list');
   el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading categories...</div>';
-  const { data, error } = await sb.from('categories').select('*').order('sort_order', { ascending: true });
+  const [{ data, error }, { data: prods }] = await Promise.all([
+    sb.from('categories').select('*').order('sort_order', { ascending: true }),
+    sb.from('products').select('category')
+  ]);
   if (error) { toast('Error loading categories', false); el.innerHTML = ''; return; }
+  // Build product count map keyed by category slug
+  const prodCounts = {};
+  (prods || []).forEach(p => { if (p.category) prodCounts[p.category] = (prodCounts[p.category] || 0) + 1; });
   // Merge: always show defaults + any Supabase entries (dedupe by slug, Supabase wins)
   const sbSlugs = new Set((data || []).map(c => c.slug));
   const fallbacks = DEFAULT_ADMIN_CATEGORIES.filter(c => !sbSlugs.has(c.slug));
@@ -813,14 +820,17 @@ async function loadCategories() {
     populateCatDropdown([]);
     return;
   }
-  el.innerHTML = cats.map(c => `
+  el.innerHTML = cats.map(c => {
+    const count = prodCounts[c.slug] || 0;
+    return `
     <div class="catcard" onclick="viewCatProducts('${esc(c.slug)}')">
       <div class="catcard-info">
-        <div class="catcard-label">${esc(c.label)}</div>
+        <div class="catcard-label">${esc(c.label)}<span class="catcard-count">${count} ${count === 1 ? 'product' : 'products'}</span></div>
         <div class="catcard-slug">slug: ${esc(c.slug)}</div>
       </div>
       ${c.id ? `<button class="btn-xs d" onclick="event.stopPropagation();delCategory('${esc(c.id)}','${esc(c.label)}')">DELETE</button>` : ''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
   populateCatDropdown(cats);
 }
 

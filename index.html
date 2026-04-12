@@ -808,12 +808,20 @@ async function fetchLookbook() {
 }
 
 // ── FETCH DROPS FROM SUPABASE ────────────────────────
+function formatDropDate(dateStr) {
+  if (!dateStr) return 'DROPPING SOON';
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length !== 3) return dateStr;
+  return new Date(parts[0], parts[1] - 1, parts[2])
+    .toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 async function fetchDrops() {
   const grid = document.getElementById('drops-grid');
   if (!grid) return;
   let drops = [];
   try {
-    const { data } = await sb.from('drops').select('*').order('sort_order', { ascending: true });
+    const { data } = await sb.from('drops').select('id,name,cover_image,drop_date,description,sort_order').order('sort_order', { ascending: true });
     if (data && data.length) drops = data;
   } catch(e) {}
 
@@ -855,9 +863,7 @@ async function fetchDrops() {
 
   const frag = document.createDocumentFragment();
   drops.forEach(d => {
-    const dateStr = d.drop_date
-      ? new Date(d.drop_date + 'T00:00:00').toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' })
-      : 'DROPPING SOON';
+    const dateStr = formatDropDate(d.drop_date);
     const card = document.createElement('div');
     card.className = 'drop-card';
     card.innerHTML = `

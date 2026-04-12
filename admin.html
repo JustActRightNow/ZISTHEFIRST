@@ -1079,11 +1079,19 @@ async function delLbImage(id) {
 // ── WHAT'S DROPPING ──────────────────────────────────
 let dropEditId = null;
 
+function formatDropDate(dateStr) {
+  if (!dateStr) return 'SOON';
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length !== 3) return dateStr;
+  return new Date(parts[0], parts[1] - 1, parts[2])
+    .toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 async function loadDrops() {
   const el = document.getElementById('drops-grid');
   el.innerHTML = '<div class="loading"><div class="spinner"></div>Loading drops...</div>';
   const [{ data: drops, error }, { data: dropProds }, { data: prods }] = await Promise.all([
-    sb.from('drops').select('*').order('sort_order', { ascending: true }),
+    sb.from('drops').select('id,name,cover_image,drop_date,description,sort_order').order('sort_order', { ascending: true }),
     sb.from('drop_products').select('*'),
     sb.from('products').select('id,name,img_front,price')
   ]);
@@ -1100,9 +1108,7 @@ async function loadDrops() {
     dropProdMap[dp.drop_id].push(dp);
   });
   el.innerHTML = drops.map(d => {
-    const dateStr = d.drop_date
-      ? new Date(d.drop_date + 'T00:00:00').toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' })
-      : 'SOON';
+    const dateStr = formatDropDate(d.drop_date);
     const dps = dropProdMap[d.id] || [];
     const prodsHtml = dps.map(dp => {
       const p = prodMap[dp.product_id];

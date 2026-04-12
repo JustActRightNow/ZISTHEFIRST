@@ -1116,8 +1116,19 @@ async function loadDrops() {
           <div class="db-setup-title">⚠ DATABASE TABLES MISSING</div>
           <div class="db-setup-msg">
             The <code>drops</code> and <code>drop_products</code> tables have not been created yet in your Supabase project.<br><br>
-            Click the button below to create them automatically. You must have the
-            <code>DATABASE_URL</code> environment variable set in Netlify (Supabase → Project Settings → Database → Connection string URI).
+            Click the button below to create them automatically. You need <strong>one</strong> of the following in your Netlify environment variables:<br><br>
+            <strong>Option A — recommended (avoids DNS/connection errors):</strong>
+            <ul style="margin:4px 0 12px 0;padding-left:20px;">
+              <li><code>SUPABASE_URL</code> — already set if the admin panel loads</li>
+              <li><code>SUPABASE_ACCESS_TOKEN</code> — a Personal Access Token from
+              <a href="https://supabase.com/dashboard/account/tokens" target="_blank" rel="noopener">supabase.com → Account → Access Tokens</a></li>
+            </ul>
+            <strong>Option B — direct Postgres:</strong>
+            <ul style="margin:4px 0 0 0;padding-left:20px;">
+              <li><code>DATABASE_URL</code> — use the <em>Session-mode Pooler</em> connection string
+              from Supabase → Project Settings → Database → Connection string
+              (the pooler URL starts with <code>aws-0-</code>, not <code>db.</code>).</li>
+            </ul>
           </div>
           <button class="btn-setup" id="btn-run-setup" onclick="setupDropsTables()">▶ CREATE TABLES NOW</button>
         </div>`;

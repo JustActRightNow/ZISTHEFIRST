@@ -1104,7 +1104,12 @@ async function loadDrops() {
     sb.from('products').select('id,name,img_front,price')
   ]);
   if (error) {
-    const isMissing = error.code === '42P01' || (error.message && error.message.toLowerCase().includes('does not exist'));
+    const isMissing = error.code === '42P01' ||
+      (error.message && (
+        error.message.toLowerCase().includes('does not exist') ||
+        error.message.toLowerCase().includes('schema cache') ||
+        error.message.toLowerCase().includes('could not find')
+      ));
     if (isMissing) {
       el.innerHTML = `
         <div class="db-setup-banner">

@@ -501,39 +501,8 @@
       <h2 class="drops-headline">WHAT'S<br/>DROPPING</h2>
       <p class="drops-sub">Limited collections. Once they're gone, they're gone. Sign up below to get notified before anyone else.</p>
     </div>
-    <div class="drops-grid fade-in">
-      <!-- ACTIVE DROP EXAMPLE — replace img src when a real drop is ready -->
-      <div class="drop-card">
-        <div class="drop-card-img">
-          <div class="drop-card-coming">
-            <div style="font-family:var(--font-display);font-size:clamp(28px,6vw,52px);color:#1a1a1a;letter-spacing:0.1em;">COMING SOON</div>
-            <div style="width:60%;height:1px;background:#1a1a1a;"></div>
-            <div style="font-size:9px;color:#222;letter-spacing:0.2em;text-transform:uppercase;">Next Collection</div>
-          </div>
-          <div class="drop-date-badge">DROPPING SOON</div>
-        </div>
-        <div class="drop-card-info">
-          <p class="drop-card-name">COLLECTION 002</p>
-          <p class="drop-card-desc">The next ZTF drop is in the works. Limited pieces. No restocks. Sign up to the drop list below to be first in line.</p>
-          <button class="drop-notify-btn" onclick="document.getElementById('drops').scrollIntoView({behavior:'smooth'})">NOTIFY ME WHEN IT DROPS</button>
-        </div>
-      </div>
-      <!-- PLACEHOLDER 2 -->
-      <div class="drop-card">
-        <div class="drop-card-img">
-          <div class="drop-card-coming">
-            <div style="font-family:var(--font-display);font-size:clamp(28px,6vw,52px);color:#1a1a1a;letter-spacing:0.1em;">TBA</div>
-            <div style="width:40%;height:1px;background:#1a1a1a;"></div>
-            <div style="font-size:9px;color:#222;letter-spacing:0.2em;text-transform:uppercase;">Collab Drop</div>
-          </div>
-          <div class="drop-date-badge" style="background:#111;border:1px solid #333;color:var(--grey-text);">UNANNOUNCED</div>
-        </div>
-        <div class="drop-card-info">
-          <p class="drop-card-name">COLLAB ??</p>
-          <p class="drop-card-desc">Something is in the works. Stay locked in. First to know wins first dibs.</p>
-          <button class="drop-notify-btn" onclick="document.getElementById('drops').scrollIntoView({behavior:'smooth'})">GET ON THE LIST</button>
-        </div>
-      </div>
+    <div class="drops-grid fade-in" id="drops-grid">
+      <!-- populated by fetchDrops() -->
     </div>
   </div>
 </div>
@@ -836,6 +805,81 @@ async function fetchLookbook() {
     document.getElementById('row2-outer'),
     row2El, 1.2, -1
   );
+}
+
+// ── FETCH DROPS FROM SUPABASE ────────────────────────
+async function fetchDrops() {
+  const grid = document.getElementById('drops-grid');
+  if (!grid) return;
+  let drops = [];
+  try {
+    const { data } = await sb.from('drops').select('*').order('sort_order', { ascending: true });
+    if (data && data.length) drops = data;
+  } catch(e) {}
+
+  if (!drops.length) {
+    // Fallback placeholders when no drops are configured yet
+    grid.innerHTML = `
+      <div class="drop-card">
+        <div class="drop-card-img">
+          <div class="drop-card-coming">
+            <div style="font-family:var(--font-display);font-size:clamp(28px,6vw,52px);color:#1a1a1a;letter-spacing:0.1em;">COMING SOON</div>
+            <div style="width:60%;height:1px;background:#1a1a1a;"></div>
+            <div style="font-size:9px;color:#222;letter-spacing:0.2em;text-transform:uppercase;">Next Collection</div>
+          </div>
+          <div class="drop-date-badge">DROPPING SOON</div>
+        </div>
+        <div class="drop-card-info">
+          <p class="drop-card-name">COLLECTION 002</p>
+          <p class="drop-card-desc">The next ZTF drop is in the works. Limited pieces. No restocks. Sign up to the drop list below to be first in line.</p>
+          <button class="drop-notify-btn" onclick="document.getElementById('drops').scrollIntoView({behavior:'smooth'})">NOTIFY ME WHEN IT DROPS</button>
+        </div>
+      </div>
+      <div class="drop-card">
+        <div class="drop-card-img">
+          <div class="drop-card-coming">
+            <div style="font-family:var(--font-display);font-size:clamp(28px,6vw,52px);color:#1a1a1a;letter-spacing:0.1em;">TBA</div>
+            <div style="width:40%;height:1px;background:#1a1a1a;"></div>
+            <div style="font-size:9px;color:#222;letter-spacing:0.2em;text-transform:uppercase;">Collab Drop</div>
+          </div>
+          <div class="drop-date-badge" style="background:#111;border:1px solid #333;color:var(--grey-text);">UNANNOUNCED</div>
+        </div>
+        <div class="drop-card-info">
+          <p class="drop-card-name">COLLAB ??</p>
+          <p class="drop-card-desc">Something is in the works. Stay locked in. First to know wins first dibs.</p>
+          <button class="drop-notify-btn" onclick="document.getElementById('drops').scrollIntoView({behavior:'smooth'})">GET ON THE LIST</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+  drops.forEach(d => {
+    const dateStr = d.drop_date
+      ? new Date(d.drop_date + 'T00:00:00').toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' })
+      : 'DROPPING SOON';
+    const card = document.createElement('div');
+    card.className = 'drop-card';
+    card.innerHTML = `
+      <div class="drop-card-img">
+        ${d.cover_image
+          ? `<img src="${sanitize(d.cover_image)}" alt="${sanitize(d.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;"/>`
+          : `<div class="drop-card-coming">
+              <div style="font-family:var(--font-display);font-size:clamp(28px,6vw,52px);color:#1a1a1a;letter-spacing:0.1em;">COMING SOON</div>
+              <div style="width:60%;height:1px;background:#1a1a1a;"></div>
+              <div style="font-size:9px;color:#222;letter-spacing:0.2em;text-transform:uppercase;">Next Collection</div>
+            </div>`}
+        <div class="drop-date-badge">${sanitize(dateStr)}</div>
+      </div>
+      <div class="drop-card-info">
+        <p class="drop-card-name">${sanitize(d.name)}</p>
+        <p class="drop-card-desc">${sanitize(d.description || 'Limited pieces. No restocks. Sign up to the drop list below to be first in line.')}</p>
+        <button class="drop-notify-btn" onclick="document.getElementById('drops').scrollIntoView({behavior:'smooth'})">NOTIFY ME WHEN IT DROPS</button>
+      </div>`;
+    frag.appendChild(card);
+  });
+  grid.innerHTML = '';
+  grid.appendChild(frag);
 }
 
 // ── FETCH PRODUCTS FROM SUPABASE ──────────────────────
@@ -1275,6 +1319,7 @@ async function init() {
   fetchProducts();
   loadCategories();
   fetchLookbook();
+  fetchDrops();
   updateCartUI();
   observeFadeIns();
 }

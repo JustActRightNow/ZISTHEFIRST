@@ -1250,7 +1250,8 @@ function initLookbookRow(outerEl, rowEl, baseSpeed, direction) {
 
     if (!isDragging) {
       // Ease velocity toward target speed
-      velocity += (baseSpeed * direction - velocity) * 0.05;
+      // direction=1 → left scroll (negative velocity), direction=-1 → right scroll (positive velocity)
+      velocity += (-baseSpeed * direction - velocity) * 0.05;
     } else {
       velocity *= 0.88;
     }

@@ -1118,14 +1118,15 @@ async function saveLbImage() {
 
   // Backward compatibility for databases that have not run recent lookbook migrations.
   if (error && /column/i.test(error.message || '')) {
-    let msg = (error.message || '').toLowerCase();
+    const getErrMsg = () => (error && error.message ? error.message : '').toLowerCase();
+    let msg = getErrMsg();
     if (msg.includes('product1') || msg.includes('product2')) {
       delete payload.product1_id;
       delete payload.product2_id;
       ({ error } = await sb.from('lookbook').insert([payload]));
-      msg = (error && error.message ? error.message : '').toLowerCase();
+      msg = getErrMsg();
     }
-    if (error && msg.includes('line')) {
+    if (error && getErrMsg().includes('line')) {
       delete payload.line;
       ({ error } = await sb.from('lookbook').insert([payload]));
     }

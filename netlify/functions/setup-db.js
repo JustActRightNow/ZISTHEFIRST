@@ -4,8 +4,9 @@
 // Creates the `categories`, `lookbook`, `drops`, and
 // `drop_products` tables in Supabase if they do not
 // already exist, then enables RLS with sensible
-// read-write policies. Also ensures the `line` column
-// is present on the `lookbook` table.
+// read-write policies. Also ensures the `line`,
+// `product1_id`, and `product2_id` columns are present
+// on the `lookbook` table (for the Shop the Look feature).
 //
 // Two connection methods are supported (in priority order):
 //
@@ -39,19 +40,23 @@ CREATE TABLE IF NOT EXISTS categories (
   created_at timestamptz DEFAULT now()
 );
 
--- lookbook table (with line column for two-row layout)
+-- lookbook table (with line column for two-row layout and Shop the Look product links)
 CREATE TABLE IF NOT EXISTS lookbook (
-  id         uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
-  url        text        NOT NULL,
-  label      text,
-  alt        text,
-  sort_order int         DEFAULT 0,
-  line       int         DEFAULT 1,
-  created_at timestamptz DEFAULT now()
+  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  url         text        NOT NULL,
+  label       text,
+  alt         text,
+  sort_order  int         DEFAULT 0,
+  line        int         DEFAULT 1,
+  product1_id uuid        REFERENCES products(id) ON DELETE SET NULL,
+  product2_id uuid        REFERENCES products(id) ON DELETE SET NULL,
+  created_at  timestamptz DEFAULT now()
 );
 
--- Ensure the line column exists on existing lookbook tables
-ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS line int DEFAULT 1;
+-- Ensure all lookbook columns exist on existing tables
+ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS line        int  DEFAULT 1;
+ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS product1_id uuid REFERENCES products(id) ON DELETE SET NULL;
+ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS product2_id uuid REFERENCES products(id) ON DELETE SET NULL;
 
 -- drops table
 CREATE TABLE IF NOT EXISTS drops (
@@ -239,7 +244,7 @@ async function runViaManagementApi(supabaseUrl, accessToken) {
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ success: true, message: 'categories, lookbook, drops and drop_products tables are ready.' })
+    body: JSON.stringify({ success: true, message: 'categories, lookbook (with Shop the Look columns), drops and drop_products tables are ready.' })
   };
 }
 
@@ -251,7 +256,7 @@ async function runViaDirectPostgres(dbUrl) {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ success: true, message: 'categories, lookbook, drops and drop_products tables are ready.' })
+      body: JSON.stringify({ success: true, message: 'categories, lookbook (with Shop the Look columns), drops and drop_products tables are ready.' })
     };
   } catch (err) {
     console.error('setup-db postgres error:', err.message);

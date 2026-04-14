@@ -710,6 +710,18 @@ function sanitize(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;').slice(0,300);
 }
 
+// Add Cloudinary auto-format + quality + width transforms to any Cloudinary URL.
+// This dramatically reduces file sizes on mobile (serves WebP where supported).
+function cloudinaryOpt(url, w) {
+  if (!url || typeof url !== 'string') return '';
+  const width = parseInt(w, 10);
+  if (!width || width <= 0) return url;
+  return url.replace(
+    /^(https?:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)/,
+    `$1f_auto,q_auto,w_${width}/`
+  );
+}
+
 // ── SUPABASE CLIENT ───────────────────────────────────
 // Keys loaded at runtime from /.netlify/functions/get-config
 // Nothing sensitive lives in this file
@@ -791,7 +803,8 @@ async function fetchLookbook() {
   const line1 = items.filter(i => (i.line ?? 1) !== 2);
   const line2 = items.filter(i => i.line === 2);
   function makeItem(item) {
-    return `<div class="lookbook-item"><img src="${sanitize(item.url)}" alt="${sanitize(item.alt||'')}" loading="lazy"/><div class="lookbook-item-label">${sanitize(item.label||'')}</div></div>`;
+    const src = sanitize(cloudinaryOpt(item.url, 500));
+    return `<div class="lookbook-item"><img src="${src}" alt="${sanitize(item.alt||'')}" loading="eager" onerror="this.style.visibility='hidden'"/><div class="lookbook-item-label">${sanitize(item.label||'')}</div></div>`;
   }
   const fwd1 = line1.map(makeItem).join('');
   const fwd2 = line2.map(makeItem).join('');
@@ -870,7 +883,7 @@ async function fetchDrops() {
     card.innerHTML = `
       <div class="drop-card-img">
         ${d.cover_image
-          ? `<img src="${sanitize(d.cover_image)}" alt="${sanitize(d.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;"/>`
+          ? `<img src="${sanitize(cloudinaryOpt(d.cover_image,700))}" alt="${sanitize(d.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>`
           : `<div class="drop-card-coming">
               <div style="font-family:var(--font-display);font-size:clamp(28px,6vw,52px);color:#1a1a1a;letter-spacing:0.1em;">COMING SOON</div>
               <div style="width:60%;height:1px;background:#1a1a1a;"></div>
@@ -964,11 +977,11 @@ function renderProducts(){
       <div class="product-img-wrap">
         <div class="flip-inner">
           <div class="flip-front">
-            ${p.img?`<img src="${p.img}" alt="${sanitize(p.name)}" loading="lazy" decoding="async"/>`:`<div class="product-img-placeholder">ZISTHEFIRST</div>`}
+            ${p.img?`<img src="${cloudinaryOpt(p.img,600)}" alt="${sanitize(p.name)}" loading="lazy" decoding="async" onerror="this.style.display='none'"/>`:`<div class="product-img-placeholder">ZISTHEFIRST</div>`}
           </div>
           <div class="flip-back">
             ${p.imgBack
-              ? `<img src="${p.imgBack}" alt="${sanitize(p.name)} back" loading="lazy" decoding="async"/>`
+              ? `<img src="${cloudinaryOpt(p.imgBack,600)}" alt="${sanitize(p.name)} back" loading="lazy" decoding="async" onerror="this.style.display='none'"/>`
               : `<div class="flip-back-placeholder">
                   <div class="flip-back-name">${sanitize(p.name)}</div>
                   <div class="flip-back-price">&#8358;${formatPrice(p.price)}</div>
@@ -1002,7 +1015,7 @@ function openModal(id){
   document.getElementById('modal-price').textContent=formatPrice(currentProduct.price);
   document.getElementById('modal-badge').innerHTML=`<span class="badge ${currentProduct.type==='limited'?'badge-limited':'badge-available'}">${currentProduct.tag}</span>`;
   const imgC=document.getElementById('modal-img-container');
-  imgC.innerHTML=currentProduct.img?`<img src="${currentProduct.img}" alt="${sanitize(currentProduct.name)}" style="width:100%;height:100%;object-fit:cover;"/>`:`<div class="modal-img-placeholder">ZISTHEFIRST</div>`;
+  imgC.innerHTML=currentProduct.img?`<img src="${sanitize(cloudinaryOpt(currentProduct.img,800))}" alt="${sanitize(currentProduct.name)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.outerHTML='<div class=\\'modal-img-placeholder\\'>ZISTHEFIRST</div>'"/>`:`<div class="modal-img-placeholder">ZISTHEFIRST</div>`;
   const sizesEl=document.getElementById('modal-sizes');
   sizesEl.innerHTML=currentProduct.sizes.map(s=>`<button class="size-btn" onclick="selectSize('${s}',this)">${s}</button>`).join('');
   // Reset custom size field

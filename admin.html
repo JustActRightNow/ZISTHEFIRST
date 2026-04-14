@@ -171,7 +171,8 @@ tr:hover td{background:#080808;}
 .lbcard-img img{width:100%;height:100%;object-fit:cover;}
 .lbcard-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:13px;color:#1a1a1a;}
 .lbcard-body{padding:13px;}
-.lbcard-label{font-family:var(--font-d);font-size:14px;letter-spacing:0.05em;margin-bottom:8px;line-height:1.2;}
+.lbcard-label{font-family:var(--font-d);font-size:14px;letter-spacing:0.05em;margin-bottom:4px;line-height:1.2;}
+.lbcard-linked{font-size:9px;color:#cc6600;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;border-left:2px solid #cc6600;padding-left:6px;}
 .lbcard-actions{display:flex;gap:5px;}
 
 /* ── DROP COLLECTION CARD ── */
@@ -359,6 +360,16 @@ tr:hover td{background:#080808;}
         </select>
       </div>
       <div class="field"><label>Sort Order</label><input type="number" id="lb-sort" placeholder="0" min="0" value="0"/></div>
+      <div class="frow">
+        <div class="field">
+          <label>Linked Product 1 <span style="font-size:9px;color:var(--grey-text);">(Shop Look)</span></label>
+          <select id="lb-prod1"><option value="">— none —</option></select>
+        </div>
+        <div class="field">
+          <label>Linked Product 2 <span style="font-size:9px;color:var(--grey-text);">(optional)</span></label>
+          <select id="lb-prod2"><option value="">— none —</option></select>
+        </div>
+      </div>
       <button class="btn-red" onclick="saveLbImage()">SAVE IMAGE</button>
     </div>
   </div>
@@ -488,10 +499,14 @@ tr:hover td{background:#080808;}
  *   alt text,
  *   sort_order int DEFAULT 0,
  *   line int DEFAULT 1,
+ *   product1_id uuid REFERENCES products(id) ON DELETE SET NULL,
+ *   product2_id uuid REFERENCES products(id) ON DELETE SET NULL,
  *   created_at timestamptz DEFAULT now()
  * );
- * -- If the table already exists, add the line column:
+ * -- If the table already exists, run these migrations:
  * -- ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS line int DEFAULT 1;
+ * -- ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS product1_id uuid REFERENCES products(id) ON DELETE SET NULL;
+ * -- ALTER TABLE lookbook ADD COLUMN IF NOT EXISTS product2_id uuid REFERENCES products(id) ON DELETE SET NULL;
  *
  * SUPABASE TABLES REQUIRED FOR WHAT'S DROPPING:
  *
@@ -1021,7 +1036,15 @@ async function loadLookbook() {
     el.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div class="empty-txt">No lookbook images yet. Add one above.</div></div>';
     return;
   }
-  el.innerHTML = items.map(img => `
+  // Build a product name lookup from allProds (loaded on boot)
+  const prodNameMap = {};
+  allProds.forEach(p => { prodNameMap[p.id] = p.name; });
+  el.innerHTML = items.map(img => {
+    const linkedNames = [img.product1_id, img.product2_id]
+      .filter(Boolean)
+      .map(id => prodNameMap[id] || id)
+      .join(', ');
+    return `
     <div class="lbcard">
       <div class="lbcard-img">${img.url
         ? `<img src="${esc(img.url)}" alt="${esc(img.alt||'')}" loading="lazy"/>`
@@ -1029,12 +1052,14 @@ async function loadLookbook() {
       </div>
       <div class="lbcard-body">
         <div class="lbcard-label">${esc(img.label||'—')}</div>
-        <div class="lbcard-meta" style="font-size:9px;color:var(--grey-text);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:8px;">LINE ${esc(String(img.line||1))}</div>
+        <div class="lbcard-meta" style="font-size:9px;color:var(--grey-text);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">LINE ${esc(String(img.line||1))}</div>
+        ${linkedNames ? `<div class="lbcard-linked">SHOP LOOK: ${esc(linkedNames)}</div>` : ''}
         <div class="lbcard-actions">
           ${img.id ? `<button class="btn-xs d" onclick="delLbImage('${esc(img.id)}')">DELETE</button>` : ''}
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function openLbModal() {
@@ -1044,6 +1069,11 @@ function openLbModal() {
   document.getElementById('lb-line').value = '1';
   document.getElementById('lb-sort').value = '0';
   document.getElementById('lb-prev').style.display = 'none';
+  // Populate product selects with current product list
+  const emptyOpt = '<option value="">— none —</option>';
+  const prodOpts = emptyOpt + allProds.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  document.getElementById('lb-prod1').innerHTML = prodOpts;
+  document.getElementById('lb-prod2').innerHTML = prodOpts;
   document.getElementById('lb-modal').classList.add('on');
 }
 function closeLbModal() { document.getElementById('lb-modal').classList.remove('on'); }
@@ -1080,8 +1110,10 @@ async function saveLbImage() {
   const alt   = document.getElementById('lb-alt').value.trim();
   const line  = parseInt(document.getElementById('lb-line').value) || 1;
   const sort  = parseInt(document.getElementById('lb-sort').value) || 0;
+  const prod1 = document.getElementById('lb-prod1').value || null;
+  const prod2 = document.getElementById('lb-prod2').value || null;
   if (!url) { toast('Please upload an image first', false); return; }
-  const { error } = await sb.from('lookbook').insert([{ url, label, alt, sort_order: sort, line }]);
+  const { error } = await sb.from('lookbook').insert([{ url, label, alt, sort_order: sort, line, product1_id: prod1, product2_id: prod2 }]);
   if (error) { toast('Save failed: ' + error.message, false); return; }
   toast('Lookbook image added ✓', true);
   closeLbModal();

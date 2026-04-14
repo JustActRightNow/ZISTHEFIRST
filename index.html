@@ -844,7 +844,7 @@ async function fetchLookbook() {
     const p1 = hasProducts ? sanitize(item.product1_id || '') : '';
     const p2 = hasProducts ? sanitize(item.product2_id || '') : '';
     const shopBtn = hasProducts
-      ? `<button class="lookbook-shop-look-btn" onclick="event.stopPropagation();openShopLook('${p1}','${p2}')">SHOP LOOK</button>`
+      ? `<button class="lookbook-shop-look-btn" data-p1="${p1}" data-p2="${p2}" onclick="event.stopPropagation();openShopLook(this.dataset.p1,this.dataset.p2)">SHOP LOOK</button>`
       : '';
     return `<div class="lookbook-item"><img src="${src}" alt="${sanitize(item.alt||'')}" loading="eager" onerror="this.style.visibility='hidden'"/><div class="lookbook-item-label"><div>${sanitize(item.label||'')}</div>${shopBtn}</div></div>`;
   }
@@ -1108,7 +1108,7 @@ function openShopLook(p1Id, p2Id) {
       <div class="shop-look-product-info">
         <p class="shop-look-product-name">${sanitize(p.name)}</p>
         <p class="shop-look-product-price"><span class="naira">&#8358;</span>${formatPrice(p.price)}</p>
-        <button class="shop-look-view-btn" onclick="closeShopLook();openModal('${sanitize(p.id)}')">VIEW &amp; ADD TO CART</button>
+        <button class="shop-look-view-btn" data-product-id="${sanitize(p.id)}" onclick="handleShopLookView(this.dataset.productId)">VIEW &amp; ADD TO CART</button>
       </div>
     </div>`).join('');
   document.getElementById('shop-look-overlay').classList.add('open');
@@ -1120,6 +1120,10 @@ function closeShopLook() {
 }
 function closeShopLookOnOverlay(e) {
   if (e.target === document.getElementById('shop-look-overlay')) closeShopLook();
+}
+function handleShopLookView(productId) {
+  closeShopLook();
+  openModal(productId);
 }
 function addToCartFromModal(){
   if(!selectedSize||!currentProduct)return;

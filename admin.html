@@ -1113,7 +1113,24 @@ async function saveLbImage() {
   const prod1 = document.getElementById('lb-prod1').value || null;
   const prod2 = document.getElementById('lb-prod2').value || null;
   if (!url) { toast('Please upload an image first', false); return; }
-  const { error } = await sb.from('lookbook').insert([{ url, label, alt, sort_order: sort, line, product1_id: prod1, product2_id: prod2 }]);
+  const payload = { url, label, alt, sort_order: sort, line, product1_id: prod1, product2_id: prod2 };
+  let { error } = await sb.from('lookbook').insert([payload]);
+
+  // Backward compatibility for databases that have not run recent lookbook migrations.
+  if (error && /column/i.test(error.message || '')) {
+    let msg = (error.message || '').toLowerCase();
+    if (msg.includes('product1') || msg.includes('product2')) {
+      delete payload.product1_id;
+      delete payload.product2_id;
+      ({ error } = await sb.from('lookbook').insert([payload]));
+      msg = (error && error.message ? error.message : '').toLowerCase();
+    }
+    if (error && msg.includes('line')) {
+      delete payload.line;
+      ({ error } = await sb.from('lookbook').insert([payload]));
+    }
+  }
+
   if (error) { toast('Save failed: ' + error.message, false); return; }
   toast('Lookbook image added ✓', true);
   closeLbModal();

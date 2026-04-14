@@ -1058,6 +1058,7 @@ async function loadLookbook() {
         <div class="lbcard-meta" style="font-size:9px;color:var(--grey-text);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">LINE ${esc(String(img.line||1))}</div>
         ${linkedNames ? `<div class="lbcard-linked">SHOP LOOK: ${esc(linkedNames)}</div>` : ''}
         <div class="lbcard-actions">
+          ${img.id ? `<button class="btn-xs" onclick="editLbImage('${esc(img.id)}')">EDIT</button>` : ''}
           ${img.id ? `<button class="btn-xs d" onclick="delLbImage('${esc(img.id)}')">DELETE</button>` : ''}
         </div>
       </div>
@@ -1066,6 +1067,8 @@ async function loadLookbook() {
 }
 
 function openLbModal() {
+  lbEditId = null;
+  document.querySelector('#lb-modal .mtitle').textContent = 'ADD LOOKBOOK IMAGE';
   document.getElementById('lb-url').value = '';
   document.getElementById('lb-label').value = '';
   document.getElementById('lb-alt').value = '';
@@ -1079,7 +1082,29 @@ function openLbModal() {
   document.getElementById('lb-prod2').innerHTML = prodOpts;
   document.getElementById('lb-modal').classList.add('on');
 }
-function closeLbModal() { document.getElementById('lb-modal').classList.remove('on'); }
+function closeLbModal() { lbEditId = null; document.getElementById('lb-modal').classList.remove('on'); }
+
+async function editLbImage(id) {
+  const { data, error } = await sb.from('lookbook').select('*').eq('id', id).single();
+  if (error || !data) { toast('Could not load image', false); return; }
+  lbEditId = id;
+  document.querySelector('#lb-modal .mtitle').textContent = 'EDIT LOOKBOOK IMAGE';
+  const emptyOpt = '<option value="">— none —</option>';
+  const prodOpts = emptyOpt + allProds.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  document.getElementById('lb-prod1').innerHTML = prodOpts;
+  document.getElementById('lb-prod2').innerHTML = prodOpts;
+  document.getElementById('lb-url').value   = data.url   || '';
+  document.getElementById('lb-label').value = data.label || '';
+  document.getElementById('lb-alt').value   = data.alt   || '';
+  document.getElementById('lb-line').value  = data.line  || 1;
+  document.getElementById('lb-sort').value  = data.sort_order != null ? data.sort_order : 0;
+  if (data.product1_id) document.getElementById('lb-prod1').value = data.product1_id;
+  if (data.product2_id) document.getElementById('lb-prod2').value = data.product2_id;
+  const prev = document.getElementById('lb-prev');
+  if (data.url) { prev.src = data.url; prev.style.display = 'block'; }
+  else { prev.style.display = 'none'; }
+  document.getElementById('lb-modal').classList.add('on');
+}
 
 function uploadLbImg() {
   if (typeof cloudinary === 'undefined') { toast('Cloudinary widget not loaded', false); return; }
@@ -1117,26 +1142,47 @@ async function saveLbImage() {
   const prod2 = document.getElementById('lb-prod2').value || null;
   if (!url) { toast('Please upload an image first', false); return; }
   const payload = { url, label, alt, sort_order: sort, line, product1_id: prod1, product2_id: prod2 };
-  let { error } = await sb.from('lookbook').insert([payload]);
 
-  // Backward compatibility for databases that have not run recent lookbook migrations.
-  if (error && /column/i.test(error.message || '')) {
-    const getErrMsg = () => (error && error.message ? error.message : '').toLowerCase();
-    let msg = getErrMsg();
-    if (msg.includes('product1') || msg.includes('product2')) {
-      delete payload.product1_id;
-      delete payload.product2_id;
-      ({ error } = await sb.from('lookbook').insert([payload]));
-      msg = getErrMsg();
+  if (lbEditId) {
+    // ── UPDATE existing row ──────────────────────────────────────────────────
+    let { error } = await sb.from('lookbook').update(payload).eq('id', lbEditId);
+    if (error && /column/i.test(error.message || '')) {
+      const getErrMsg = () => (error && error.message ? error.message : '').toLowerCase();
+      let msg = getErrMsg();
+      if (msg.includes('product1') || msg.includes('product2')) {
+        const p = { ...payload }; delete p.product1_id; delete p.product2_id;
+        ({ error } = await sb.from('lookbook').update(p).eq('id', lbEditId));
+        msg = (error && error.message ? error.message : '').toLowerCase();
+      }
+      if (error && msg.includes('line')) {
+        const p = { ...payload }; delete p.line;
+        ({ error } = await sb.from('lookbook').update(p).eq('id', lbEditId));
+      }
     }
-    if (error && getErrMsg().includes('line')) {
-      delete payload.line;
-      ({ error } = await sb.from('lookbook').insert([payload]));
+    if (error) { toast('Save failed: ' + error.message, false); return; }
+    toast('Lookbook image updated ✓', true);
+  } else {
+    // ── INSERT new row ───────────────────────────────────────────────────────
+    let { error } = await sb.from('lookbook').insert([payload]);
+    // Backward compatibility for databases that have not run recent lookbook migrations.
+    if (error && /column/i.test(error.message || '')) {
+      const getErrMsg = () => (error && error.message ? error.message : '').toLowerCase();
+      let msg = getErrMsg();
+      if (msg.includes('product1') || msg.includes('product2')) {
+        delete payload.product1_id;
+        delete payload.product2_id;
+        ({ error } = await sb.from('lookbook').insert([payload]));
+        msg = getErrMsg();
+      }
+      if (error && getErrMsg().includes('line')) {
+        delete payload.line;
+        ({ error } = await sb.from('lookbook').insert([payload]));
+      }
     }
+    if (error) { toast('Save failed: ' + error.message, false); return; }
+    toast('Lookbook image added ✓', true);
   }
 
-  if (error) { toast('Save failed: ' + error.message, false); return; }
-  toast('Lookbook image added ✓', true);
   closeLbModal();
   loadLookbook();
 }
@@ -1151,6 +1197,7 @@ async function delLbImage(id) {
 
 // ── WHAT'S DROPPING ──────────────────────────────────
 let dropEditId = null;
+let lbEditId = null;
 
 function formatDropDate(dateStr) {
   if (!dateStr) return 'SOON';

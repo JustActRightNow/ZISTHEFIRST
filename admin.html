@@ -175,7 +175,9 @@ tr:hover td{background:#080808;}
 .lbcard-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:13px;color:#1a1a1a;}
 .lbcard-body{padding:13px;}
 .lbcard-label{font-family:var(--font-d);font-size:14px;letter-spacing:0.05em;margin-bottom:4px;line-height:1.2;}
-.lbcard-linked{font-size:9px;color:#cc6600;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;border-left:2px solid #cc6600;padding-left:6px;}
+.lbcard-badge{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;padding:3px 6px;border-left:2px solid;}
+.lbcard-badge.shoppable{color:var(--red);border-color:var(--red);}
+.lbcard-badge.poster{color:#555;border-color:#333;}
 .lbcard-actions{display:flex;gap:5px;}
 
 /* ── DROP COLLECTION CARD ── */
@@ -363,9 +365,10 @@ tr:hover td{background:#080808;}
         </select>
       </div>
       <div class="field"><label>Sort Order</label><input type="number" id="lb-sort" placeholder="0" min="0" value="0"/></div>
+      <div style="margin:14px 0 8px;font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--grey-text);border-top:1px solid #222;padding-top:14px;">SHOP THE LOOK <span style="color:#555;font-size:8px;">(optional — leave both blank for poster-only images)</span></div>
       <div class="frow">
         <div class="field">
-          <label>Linked Product 1 <span style="font-size:9px;color:var(--grey-text);">(Shop Look)</span></label>
+          <label>Linked Product 1</label>
           <select id="lb-prod1"><option value="">— none —</option></select>
         </div>
         <div class="field">
@@ -373,7 +376,7 @@ tr:hover td{background:#080808;}
           <select id="lb-prod2"><option value="">— none —</option></select>
         </div>
       </div>
-      <button class="btn-red" onclick="saveLbImage()">SAVE IMAGE</button>
+      <button id="lb-save-btn" class="btn-red" onclick="saveLbImage()">SAVE IMAGE</button>
     </div>
   </div>
 </div>
@@ -1047,6 +1050,9 @@ async function loadLookbook() {
       .filter(Boolean)
       .map(id => prodNameMap[id] || id)
       .join(', ');
+    const shopBadge = linkedNames
+      ? `<div class="lbcard-badge shoppable">● SHOPPABLE — ${esc(linkedNames)}</div>`
+      : `<div class="lbcard-badge poster">○ POSTER ONLY</div>`;
     return `
     <div class="lbcard">
       <div class="lbcard-img">${img.url
@@ -1056,7 +1062,7 @@ async function loadLookbook() {
       <div class="lbcard-body">
         <div class="lbcard-label">${esc(img.label||'—')}</div>
         <div class="lbcard-meta" style="font-size:9px;color:var(--grey-text);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:6px;">LINE ${esc(String(img.line||1))}</div>
-        ${linkedNames ? `<div class="lbcard-linked">SHOP LOOK: ${esc(linkedNames)}</div>` : ''}
+        ${shopBadge}
         <div class="lbcard-actions">
           ${img.id ? `<button class="btn-xs" onclick="editLbImage('${esc(img.id)}')">EDIT</button>` : ''}
           ${img.id ? `<button class="btn-xs d" onclick="delLbImage('${esc(img.id)}')">DELETE</button>` : ''}
@@ -1069,6 +1075,7 @@ async function loadLookbook() {
 function openLbModal() {
   lbEditId = null;
   document.querySelector('#lb-modal .mtitle').textContent = 'ADD LOOKBOOK IMAGE';
+  document.getElementById('lb-save-btn').textContent = 'SAVE IMAGE';
   document.getElementById('lb-url').value = '';
   document.getElementById('lb-label').value = '';
   document.getElementById('lb-alt').value = '';
@@ -1089,6 +1096,7 @@ async function editLbImage(id) {
   if (error || !data) { toast('Could not load image', false); return; }
   lbEditId = id;
   document.querySelector('#lb-modal .mtitle').textContent = 'EDIT LOOKBOOK IMAGE';
+  document.getElementById('lb-save-btn').textContent = 'SAVE CHANGES';
   const emptyOpt = '<option value="">— none —</option>';
   const prodOpts = emptyOpt + allProds.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
   document.getElementById('lb-prod1').innerHTML = prodOpts;
@@ -1150,13 +1158,14 @@ async function saveLbImage() {
       const getErrMsg = () => (error && error.message ? error.message : '').toLowerCase();
       let msg = getErrMsg();
       if (msg.includes('product1') || msg.includes('product2')) {
-        const p = { ...payload }; delete p.product1_id; delete p.product2_id;
-        ({ error } = await sb.from('lookbook').update(p).eq('id', lbEditId));
-        msg = (error && error.message ? error.message : '').toLowerCase();
+        delete payload.product1_id;
+        delete payload.product2_id;
+        ({ error } = await sb.from('lookbook').update(payload).eq('id', lbEditId));
+        msg = getErrMsg();
       }
       if (error && msg.includes('line')) {
-        const p = { ...payload }; delete p.line;
-        ({ error } = await sb.from('lookbook').update(p).eq('id', lbEditId));
+        delete payload.line;
+        ({ error } = await sb.from('lookbook').update(payload).eq('id', lbEditId));
       }
     }
     if (error) { toast('Save failed: ' + error.message, false); return; }
